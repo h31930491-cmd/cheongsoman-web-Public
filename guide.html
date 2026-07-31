@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>청소만 사용가이드</title>
+<style>
+  :root { --teal:#0B6E6E; --teal-dark:#095959; --teal-soft:#E5F0EF; --ink:#17242B; --muted:#5B6B72;
+          --line:#E2E8E8; --bg:#F4F7F6; --amber:#B26A00; --amber-soft:#FFF4E0; }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',system-ui,sans-serif; line-height:1.7; }
+
+  /* 헤더 */
+  header { background:var(--teal); color:#fff; padding:36px 20px 30px; }
+  .head-inner { max-width:680px; margin:0 auto; }
+  header h1 { font-size:26px; margin:0 0 6px; font-weight:800; }
+  header p { margin:0; color:rgba(255,255,255,.88); font-size:15px; }
+
+  .wrap { max-width:680px; margin:0 auto; padding:28px 20px 72px; }
+
+  /* 목차 */
+  nav.toc { background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-bottom:28px; }
+  nav.toc h2 { font-size:15px; color:var(--muted); margin:0 0 12px; font-weight:700; letter-spacing:.02em; }
+  .toc-group { margin-bottom:16px; }
+  .toc-group:last-child { margin-bottom:0; }
+  .toc-group > .g-title { font-size:16px; font-weight:800; margin:0 0 8px; }
+  nav.toc ol { margin:0; padding-left:0; list-style:none; }
+  nav.toc li { margin:0; }
+  nav.toc a { display:block; color:var(--ink); text-decoration:none; font-size:15px;
+    padding:7px 10px; border-radius:8px; }
+  nav.toc a:hover { background:var(--teal-soft); color:var(--teal-dark); }
+  nav.toc a .num { color:var(--teal); font-weight:700; margin-right:8px; }
+
+  /* 섹션 헤더 */
+  .section { scroll-margin-top:12px; margin:34px 0 14px; }
+  .section h2 { font-size:22px; margin:0; font-weight:800; }
+  .section .s-desc { color:var(--muted); font-size:14px; margin:4px 0 0; }
+  .section.staff { background:var(--teal-soft); border-radius:16px; padding:20px 18px 4px; margin-top:40px; }
+  .section.staff h2 { color:var(--teal-dark); }
+
+  /* 글 카드 */
+  article.guide { background:#fff; border:1px solid var(--line); border-radius:16px;
+    padding:20px 22px; margin-bottom:16px; scroll-margin-top:12px; }
+  article.guide h3 { font-size:18px; margin:0 0 12px; font-weight:800; }
+  .video { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px dashed var(--line);
+    border-radius:12px; padding:12px 14px; color:var(--muted); font-size:14px; font-weight:600; margin-bottom:16px; }
+  .video .play { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px;
+    border-radius:50%; background:var(--teal); color:#fff; font-size:12px; flex-shrink:0; }
+  ol.steps { margin:0; padding-left:0; list-style:none; counter-reset:step; }
+  ol.steps > li { position:relative; padding:0 0 12px 34px; counter-increment:step; }
+  ol.steps > li:last-child { padding-bottom:0; }
+  ol.steps > li::before { content:counter(step); position:absolute; left:0; top:1px;
+    width:24px; height:24px; border-radius:50%; background:var(--teal-soft); color:var(--teal-dark);
+    font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  ol.steps p { margin:0; font-size:15.5px; }
+  ol.steps .sub { color:var(--muted); font-size:14px; margin-top:2px; }
+
+  /* 앱 실제 문구 강조(코드 문구와 글자 단위 일치) */
+  .btn { display:inline-block; background:var(--teal-soft); color:var(--teal-dark);
+    border-radius:6px; padding:1px 7px; font-weight:700; font-size:14.5px; white-space:nowrap; }
+  .menu { font-weight:700; color:var(--teal-dark); }
+
+  .tip { display:flex; gap:9px; background:var(--amber-soft); border-radius:12px;
+    padding:12px 14px; margin-top:16px; font-size:14.5px; color:#6b4a10; }
+  .tip b { color:var(--amber); }
+
+  /* FAQ */
+  .faq .q { font-weight:700; margin:14px 0 2px; }
+  .faq .q:first-child { margin-top:0; }
+  .faq p { font-size:15px; margin:0; }
+
+  .contact { text-align:center; }
+  .contact .email { font-size:19px; font-weight:800; color:var(--teal); }
+  a { color:var(--teal); }
+  footer { margin-top:32px; text-align:center; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <h1>청소만 사용가이드</h1>
+    <p>사장님은 청소에만 집중하세요. 예약·문자·매출 정리는 청소만이 도와드립니다.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ══════════ 목차 ══════════ -->
+  <nav class="toc">
+    <h2>목차</h2>
+
+    <div class="toc-group">
+      <p class="g-title">🌱 처음 시작하기</p>
+      <ol>
+        <li><a href="#g1-1"><span class="num">1</span>청소만 시작하기 (가입·초기 설정)</a></li>
+        <li><a href="#g1-2"><span class="num">2</span>첫 예약 등록하기</a></li>
+        <li><a href="#g1-3"><span class="num">3</span>문자 템플릿 준비하기</a></li>
+        <li><a href="#g1-4"><span class="num">4</span>사업자 정보·월 목표 설정하기</a></li>
+      </ol>
+    </div>
+
+    <div class="toc-group">
+      <p class="g-title">💡 이럴 땐 이렇게</p>
+      <ol>
+        <li><a href="#g2-1"><span class="num">1</span>카톡·문자로 온 예약을 등록할 때</a></li>
+        <li><a href="#g2-2"><span class="num">2</span>돈(예약금·잔금)을 받았을 때</a></li>
+        <li><a href="#g2-3"><span class="num">3</span>현금영수증을 요청받았을 때</a></li>
+        <li><a href="#g2-4"><span class="num">4</span>예약이 취소되거나 손님이 안 왔을 때</a></li>
+        <li><a href="#g2-5"><span class="num">5</span>일을 마쳤을 때</a></li>
+      </ol>
+    </div>
+
+    <div class="toc-group">
+      <p class="g-title">📖 기능 가이드</p>
+      <ol>
+        <li><a href="#g3-1"><span class="num">1</span>홈 화면</a></li>
+        <li><a href="#g3-2"><span class="num">2</span>일정</a></li>
+        <li><a href="#g3-3"><span class="num">3</span>매출</a></li>
+        <li><a href="#g3-4"><span class="num">4</span>통계</a></li>
+        <li><a href="#g3-5"><span class="num">5</span>고객</a></li>
+        <li><a href="#g3-6"><span class="num">6</span>설정</a></li>
+      </ol>
+    </div>
+
+    <div class="toc-group">
+      <p class="g-title">👥 직원용 가이드</p>
+      <ol>
+        <li><a href="#g4-1"><span class="num">1</span>직원 계정 연결하기</a></li>
+        <li><a href="#g4-2"><span class="num">2</span>직원 홈 보기</a></li>
+        <li><a href="#g4-3"><span class="num">3</span>내 일정 확인하기</a></li>
+        <li><a href="#g4-4"><span class="num">4</span>받은 돈·예약금 기록하기</a></li>
+        <li><a href="#g4-5"><span class="num">5</span>현금영수증 요청하기</a></li>
+        <li><a href="#g4-6"><span class="num">6</span>내 실적·내 정산 보기</a></li>
+      </ol>
+    </div>
+
+    <div class="toc-group">
+      <p class="g-title">❓ 그 외</p>
+      <ol>
+        <li><a href="#faq"><span class="num">·</span>자주 묻는 질문</a></li>
+        <li><a href="#contact"><span class="num">·</span>문의하기</a></li>
+      </ol>
+    </div>
+  </nav>
+
+
+  <!-- ══════════ 🌱 처음 시작하기 ══════════ -->
+  <div class="section" id="sec1">
+    <h2>🌱 처음 시작하기</h2>
+    <p class="s-desc">청소만을 처음 켰다면 이 순서대로 준비해 보세요.</p>
+  </div>
+
+  <article class="guide" id="g1-1">
+    <h3>1. 청소만 시작하기 (가입·초기 설정)</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>회원가입·로그인 후 첫 화면에서 <span class="btn">대표로 시작</span>과 <span class="btn">초대받은 직원</span> 중 <b>대표로 시작</b>을 누릅니다.</p></li>
+      <li><p><b>업체명</b>과 <b>업종</b>(복수 선택 가능)을 입력하고 <span class="btn">시작하기</span>를 누릅니다.</p>
+        <p class="sub">업종을 고르면 문자 템플릿·유입채널·정책이 자동으로 준비됩니다.</p></li>
+      <li><p>대표 화면(홈·일정·고객·매출·통계 5개 탭)이 열리면 준비 완료입니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 가입 단계에서는 <b>업체명·업종</b>만 입력합니다. 견적서·영수증에 들어가는 상호·대표자명·사업자번호는 나중에 <span class="menu">설정 › 사업자 정보</span>에서 채우면 됩니다(4번 글 참고).</span></div>
+  </article>
+
+  <article class="guide" id="g1-2">
+    <h3>2. 첫 예약 등록하기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>화면 우하단 <span class="btn">+</span> 버튼을 눌러 예약 등록을 엽니다.</p></li>
+      <li><p>손님 이름·연락처, 날짜·시간, 업종·작업 내용, 주소, 금액을 입력합니다.</p></li>
+      <li><p>카톡·문자로 받은 예약이라면 <span class="btn">대화 붙여넣기</span>로 한 번에 채울 수 있습니다(2-1번 글 참고).</p></li>
+      <li><p>담당 직원을 지정하면 <span class="menu">지시 메모</span>를 함께 남길 수 있습니다.</p></li>
+      <li><p>저장 확인창에서 내용을 확인하고 저장하면 홈·일정에 바로 표시됩니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> <span class="btn">대화 붙여넣기</span>는 <b>새 예약 등록</b>에서만 보입니다. 이미 등록한 예약을 고칠 때는 나타나지 않아요.</span></div>
+  </article>
+
+  <article class="guide" id="g1-3">
+    <h3>3. 문자 템플릿 준비하기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p><span class="menu">설정 › 문자 템플릿</span>으로 들어갑니다.</p></li>
+      <li><p>예약 진행에 맞춰 <b>5단계</b> 문자를 다듬어 둡니다:
+        <span class="btn">① 예약확정</span> · <span class="btn">② 방문 전날</span> · <span class="btn">③ 출발</span> · <span class="btn">④ 완료</span> · <span class="btn">⑤ 리뷰요청</span>.</p></li>
+      <li><p>오랜만인 고객에게 보내는 <b>재이용 안부</b> 문자도 따로 준비해 둘 수 있습니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 청소만은 문자를 <b>자동 발송하지 않습니다.</b> 문구를 만들어 드리면, 사장님이 확인 후 휴대폰 문자앱이나 카카오톡 공유로 직접 보냅니다(발송비 0원).</span></div>
+  </article>
+
+  <article class="guide" id="g1-4">
+    <h3>4. 사업자 정보·월 목표 설정하기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p><span class="menu">설정 › 사업자 정보</span>에서 상호·대표자명·사업자번호·사업장 주소·입금 계좌를 입력합니다.</p>
+        <p class="sub">견적서·영수증에 이 정보가 표시됩니다. 대표 계정에서만 관리할 수 있어요.</p></li>
+      <li><p>홈 화면의 <span class="menu">월 목표를 설정해보세요</span> 또는 <span class="menu">설정 › 월 목표</span>에서 이번 달 매출 목표를 정합니다.</p></li>
+      <li><p><span class="menu">설정 › 작업메뉴</span>에서 자주 하는 작업의 기본 금액·소요시간을 등록해 두면 예약 등록이 빨라집니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 직원을 함께 쓰려면 <span class="menu">설정 › 직원 관리</span>에서 전화번호로 직원을 등록하세요. 직원은 그 번호로 계정을 연결합니다(직원용 가이드 1번 참고).</span></div>
+  </article>
+
+
+  <!-- ══════════ 💡 이럴 땐 이렇게 ══════════ -->
+  <div class="section" id="sec2">
+    <h2>💡 이럴 땐 이렇게</h2>
+    <p class="s-desc">현장에서 자주 마주치는 상황별 사용법입니다.</p>
+  </div>
+
+  <article class="guide" id="g2-1">
+    <h3>1. 카톡·문자로 온 예약을 등록할 때</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>손님과 주고받은 대화를 복사합니다.</p></li>
+      <li><p><span class="btn">+</span>로 새 예약 등록을 열고 <span class="btn">대화 붙여넣기</span>를 누릅니다.</p></li>
+      <li><p>대화를 붙여넣고 <span class="btn">분석하기</span>를 누르면 <b>날짜·시간·연락처·주소</b> 4가지를 자동으로 뽑아 줍니다.</p></li>
+      <li><p>뽑힌 값을 확인·수정한 뒤 <span class="btn">적용</span>을 누르면 예약 폼에 채워집니다. 이름·금액 등 나머지는 직접 입력합니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 날짜나 시간을 못 찾으면 "직접 입력해주세요" 안내가 뜹니다. 자동 인식은 날짜·시간·연락처·주소만 도와드리고, 나머지는 직접 채우면 됩니다.</span></div>
+  </article>
+
+  <article class="guide" id="g2-2">
+    <h3>2. 돈(예약금·잔금)을 받았을 때</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>예약 상세 화면을 열고 결제 영역에서 <span class="btn">받은 돈 기록</span>을 누릅니다.</p></li>
+      <li><p>구분에서 <span class="btn">일반</span> 또는 <span class="btn">예약금</span>을 고르고, 금액·수단을 입력합니다.</p></li>
+      <li><p>저장하면 <b>받은 돈</b>과 <b>남은 돈</b>이 자동 계산되고, 남은 돈은 <b>미수금</b>에 자동으로 등록됩니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 청구 금액을 다 받으면 "완납 ✓"으로 표시됩니다. 남은 돈은 홈의 <span class="menu">정산 미처리</span>와 <span class="menu">매출 › 미수금</span>에서 한눈에 관리할 수 있어요.</span></div>
+  </article>
+
+  <article class="guide" id="g2-3">
+    <h3>3. 현금영수증을 요청받았을 때</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>직원이 현장에서 요청을 받았다면 예약 상세에서 <span class="btn">현금영수증 요청</span>을 눌러 대표에게 알립니다.</p></li>
+      <li><p>대표는 홈 화면의 <span class="menu">현금영수증 · 미처리 N건</span>을 눌러 모아보기로 들어갑니다.</p></li>
+      <li><p><span class="btn">손택스(홈택스) 열기</span>로 홈택스에서 실제 발급을 진행합니다.</p></li>
+      <li><p>발급을 마쳤으면 해당 예약을 열어 <span class="btn">발행 처리</span>를 누릅니다. <b>발행 완료</b>로 기록되고 직원 화면에도 표시됩니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 나중에 발급할 건은 예약 상세에서 <span class="btn">발행 예정</span>에 담아 두면 <span class="menu">현금영수증 모아보기</span> 미처리 목록에서 함께 관리됩니다. 실수로 처리했다면 <span class="btn">발행 취소</span>로 되돌릴 수 있어요.</span></div>
+  </article>
+
+  <article class="guide" id="g2-4">
+    <h3>4. 예약이 취소되거나 손님이 안 왔을 때</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>예약 상세 화면을 엽니다.</p></li>
+      <li><p>손님이 취소했으면 <span class="btn">예약 취소</span>, 연락 없이 안 왔으면 <span class="btn">노쇼 처리</span>를 누릅니다.</p></li>
+      <li><p>확인창에서 사유를 남기고 확정합니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 취소·노쇼 건수와 놓친 금액은 <span class="menu">통계 › 취소·노쇼</span>에서 사유 비중까지 확인할 수 있어요. 참고 지표라 매출·순이익 계산에는 들어가지 않습니다.</span></div>
+  </article>
+
+  <article class="guide" id="g2-5">
+    <h3>5. 일을 마쳤을 때</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>당일 확정된 예약이면 <span class="btn">작업 시작</span>으로 시작 시각을 기록할 수 있습니다.</p></li>
+      <li><p>작업을 끝냈으면 <span class="btn">완료 처리</span>를 눌러 완료로 바꿉니다.</p></li>
+      <li><p>완료 문자(④ 완료)와 함께 작업 사진을 카카오톡으로 손님에게 공유합니다.</p></li>
+      <li><p>며칠 뒤 <span class="btn">⑤ 리뷰요청</span> 문자로 후기를 부탁해 보세요.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 완료를 잘못 눌렀다면 예약 상세에서 <span class="btn">완료 취소</span>로 되돌릴 수 있습니다(대표 전용). 단, 완료 뒤 입금이 있으면 먼저 환불 기록으로 입금을 되돌려야 완료 취소가 가능합니다.</span></div>
+  </article>
+
+
+  <!-- ══════════ 📖 기능 가이드 ══════════ -->
+  <div class="section" id="sec3">
+    <h2>📖 기능 가이드</h2>
+    <p class="s-desc">화면(탭)별로 무엇을 볼 수 있는지 정리했습니다.</p>
+  </div>
+
+  <article class="guide" id="g3-1">
+    <h3>1. 홈 화면</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>맨 위에서 <span class="menu">오늘 예약</span> 건수와 <span class="menu">이번 달 매출</span>을 한눈에 봅니다.</p></li>
+      <li><p><span class="menu">예약</span> 영역에서 날짜를 넘기며 그날 예약을, 직원이 있으면 담당자별로 확인합니다.</p></li>
+      <li><p><span class="menu">보낼 문자 N건</span> · <span class="menu">다시 연락할 고객 N명</span>이 있으면 강조 카드로 알려 줍니다.</p></li>
+      <li><p><span class="menu">정산 미처리 N건</span>을 눌러 미지급·미완납을, <span class="menu">현금영수증 · 미처리 N건</span>을 눌러 현금영수증을 처리합니다.</p></li>
+      <li><p><span class="menu">문의 내역</span> · <span class="menu">빈 시간 찾기</span>로도 바로 이동할 수 있습니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 정산 미처리·현금영수증 칸은 처리할 게 없으면 회색으로, 있으면 색이 들어와 눈에 띕니다.</span></div>
+  </article>
+
+  <article class="guide" id="g3-2">
+    <h3>2. 일정</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>달력에서 예약과 정산을 날짜별로 봅니다.</p></li>
+      <li><p>상단 보기 토글 <span class="btn">전체</span> · <span class="btn">예약</span> · <span class="btn">지출</span> · <span class="btn">미수금</span>으로 원하는 것만 골라 봅니다.</p></li>
+      <li><p>월 보기에서는 그 달의 예약·완료 건수와 지출·미수금 합계 카드를 함께 보여 줍니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 날짜를 누르면 그날 예약·정산 목록이 펼쳐집니다. 새 예약은 우하단 <span class="btn">+</span>로 등록하세요.</span></div>
+  </article>
+
+  <article class="guide" id="g3-3">
+    <h3>3. 매출</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>상단 구분에서 <span class="btn">매출</span> · <span class="btn">예약</span> · <span class="btn">지출</span> · <span class="btn">미수금</span> · <span class="btn">직원 정산</span> 중 하나를 고릅니다.</p></li>
+      <li><p><span class="btn">예약</span>에서는 기간·완납/미완납·담당자별로 예약을 걸러 볼 수 있습니다.</p></li>
+      <li><p>직원 인건비를 마감하려면 <span class="btn">직원 정산</span>에서 <span class="btn">이번 달 마감</span>을 누릅니다. 마감하면 그 달 직원 정산이 고정되고 인건비가 경비로 자동 기입됩니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 마감된 달은 수수료 설정을 바꿔도 값이 변하지 않습니다. 되돌리려면 같은 자리에서 <span class="btn">마감 취소</span>를 누르면 됩니다.</span></div>
+  </article>
+
+  <article class="guide" id="g3-4">
+    <h3>4. 통계</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>맨 위 기간 토글(주·월·년)로 보고 싶은 기간을 정합니다.</p></li>
+      <li><p><span class="menu">예약 한눈에</span>(완료·취소·노쇼 흐름), <span class="menu">돈 한눈에</span>(총매출·경비·순이익)로 큰 그림을 봅니다.</p></li>
+      <li><p><span class="menu">유입 비중</span> · <span class="menu">채널별 전환</span>으로 손님이 어디서 오는지, <span class="menu">취소·노쇼</span>로 놓친 금액을 확인합니다.</p></li>
+      <li><p>그 밖에 업종별 매출·고객 지표·문의 많은 요일/시간·직원 실적·월간 리포트를 아래로 내려가며 볼 수 있습니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 매출·순이익 집계는 <b>완료된 예약</b> 기준입니다. 취소·노쇼는 참고 지표라 매출에 포함되지 않습니다.</span></div>
+  </article>
+
+  <article class="guide" id="g3-5">
+    <h3>5. 고객</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p><span class="menu">고객</span> 탭에서 고객 목록과 연락처, 지난 예약 이력을 확인합니다.</p></li>
+      <li><p>고객을 누르면 상세에서 방문 이력·누적 금액을 봅니다.</p></li>
+      <li><p>오랜만인 고객에게는 홈의 <span class="menu">다시 연락할 고객</span>에서 재이용 안부 문자를 보낼 수 있습니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> VIP 고객, 12개월 이상 방문이 없는 고객 같은 지표는 <span class="menu">통계 › 고객</span>에서 확인할 수 있어요.</span></div>
+  </article>
+
+  <article class="guide" id="g3-6">
+    <h3>6. 설정</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>홈 우상단 톱니바퀴로 <span class="menu">설정</span>에 들어갑니다.</p></li>
+      <li><p><span class="menu">문자 템플릿</span> · <span class="menu">예약금·환불·할인</span> · <span class="menu">작업메뉴</span> · <span class="menu">운영시간</span> · <span class="menu">재이용 주기</span> · <span class="menu">직원 관리</span> · <span class="menu">수수료 설정</span> · <span class="menu">월 목표</span>를 관리합니다.</p></li>
+      <li><p><span class="menu">사업자 정보</span> · <span class="menu">비밀번호 변경</span> · <span class="menu">약관 및 정책</span> · <span class="menu">데이터 내보내기</span>도 이곳에 있습니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 비밀번호를 바꾸려면 <span class="menu">설정 › 비밀번호 변경</span>을 이용하세요. 로그인 전이라면 로그인 화면의 <span class="btn">비밀번호를 잊으셨나요?</span>로 재설정 메일을 받을 수 있습니다.</span></div>
+  </article>
+
+
+  <!-- ══════════ 👥 직원용 가이드 ══════════ -->
+  <div class="section staff" id="sec4">
+    <h2>👥 직원용 가이드</h2>
+    <p class="s-desc">직원 계정으로 로그인한 분을 위한 안내입니다. 직원 화면은 홈·일정·내 정산·내 실적으로 구성됩니다.</p>
+  </div>
+
+  <article class="guide" id="g4-1">
+    <h3>1. 직원 계정 연결하기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>대표님이 <span class="menu">직원 관리</span>에 등록해 둔 전화번호를 확인합니다.</p></li>
+      <li><p>회원가입·로그인 후 첫 화면에서 <span class="btn">초대받은 직원</span>을 누릅니다.</p></li>
+      <li><p>초대받은 전화번호를 입력하고 <span class="btn">초대 확인하고 연결</span>을 누르면 직원 화면이 열립니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> "등록된 초대가 없어요"가 뜨면 번호가 다르거나 아직 등록 전입니다. 대표님께 <span class="menu">직원 관리</span> 등록을 요청하세요.</span></div>
+  </article>
+
+  <article class="guide" id="g4-2">
+    <h3>2. 직원 홈 보기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p><span class="menu">홈</span> 탭에서 나에게 배정된 오늘 예약을 확인합니다.</p></li>
+      <li><p>예약을 누르면 손님·주소·작업 내용과 대표님이 남긴 <span class="menu">지시 메모</span>를 볼 수 있습니다.</p></li>
+      <li><p>우상단 톱니바퀴로 <span class="menu">내 정보</span>(이름·전화·상태 확인, 로그아웃)로 이동합니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 직원은 본인에게 배정된 예약과 그 손님만 볼 수 있습니다. 이름·전화 변경이 필요하면 대표님께 요청하세요.</span></div>
+  </article>
+
+  <article class="guide" id="g4-3">
+    <h3>3. 내 일정 확인하기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p><span class="menu">일정</span> 탭에서 내 예약을 날짜별로 봅니다.</p></li>
+      <li><p>당일 확정된 예약은 <span class="btn">작업 시작</span>으로 시작 시각을 기록할 수 있습니다.</p></li>
+      <li><p>일을 마치면 예약 상세에서 <span class="btn">완료 처리</span>를 누릅니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> <span class="btn">작업 시작</span>은 당일 확정된 예약에서만 보입니다.</span></div>
+  </article>
+
+  <article class="guide" id="g4-4">
+    <h3>4. 받은 돈·예약금 기록하기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>배정된 예약 상세에서 <span class="btn">받은 돈 기록</span>으로 받은 금액을 남깁니다.</p></li>
+      <li><p>예약금을 받았다면 <span class="btn">예약금 받음</span> 체크로 간단히 기록할 수 있습니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 직원은 본인 배정 예약의 받은 돈을 기록할 수 있습니다. 예약 금액 자체(청구·수단 등) 수정은 대표님이 합니다.</span></div>
+  </article>
+
+  <article class="guide" id="g4-5">
+    <h3>5. 현금영수증 요청하기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p>손님이 현금영수증을 원하면 예약 상세에서 <span class="btn">현금영수증 요청</span>을 누릅니다.</p></li>
+      <li><p>요청하면 대표님 화면에 표시되고, 실제 발행은 대표님이 처리합니다.</p></li>
+      <li><p>잘못 눌렀다면 <span class="btn">요청 취소</span>로 되돌립니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 대표님이 발행을 끝내면 예약에 <b>발행 완료</b>로 표시되어, 직원 화면에서도 처리 여부를 확인할 수 있어요.</span></div>
+  </article>
+
+  <article class="guide" id="g4-6">
+    <h3>6. 내 실적·내 정산 보기</h3>
+    <div class="video"><span class="play">▶</span> 영상으로 보기 — 준비 중</div>
+    <ol class="steps">
+      <li><p><span class="menu">내 실적</span> 탭에서 내 완료 건수·평균 소요시간 등 실적을 확인합니다.</p></li>
+      <li><p><span class="menu">내 정산</span> 탭에서 내 건별 수수료와 실지급 금액을 봅니다.</p></li>
+    </ol>
+    <div class="tip"><span>💡</span><span><b>팁</b> 대표님이 그 달을 마감하면 <span class="menu">내 정산</span> 값이 마감 당시로 고정됩니다.</span></div>
+  </article>
+
+
+  <!-- ══════════ FAQ ══════════ -->
+  <div class="section" id="faq-sec">
+    <h2>❓ 자주 묻는 질문</h2>
+  </div>
+  <article class="guide faq" id="faq">
+    <p class="q">Q. 문자는 앱이 자동으로 보내나요?</p>
+    <p>아니요. 청소만은 문자·카톡 문구를 만들어 드리고, 실제 발송은 사장님이 확인 후 휴대폰의 문자앱/카카오톡 공유로 진행합니다(앱이 직접 발송하지 않습니다).</p>
+    <p class="q">Q. 대화 붙여넣기는 무엇을 자동으로 채워 주나요?</p>
+    <p>날짜·시간·연락처·주소 4가지를 뽑아 줍니다. 새 예약 등록에서만 쓸 수 있고, <span class="btn">분석하기</span> → <span class="btn">적용</span> 순서로 반영합니다. 이름·금액 등은 직접 입력합니다.</p>
+    <p class="q">Q. 구독을 해지하면 데이터가 지워지나요?</p>
+    <p>아니요. 구독을 해지하거나 기간이 끝나도 입력한 예약·고객·매출 데이터는 지워지지 않습니다. 데이터는 <b>회원 탈퇴</b>를 할 때만 삭제됩니다(법령상 보존 의무가 있는 경우 제외).</p>
+    <p class="q">Q. 구독은 어떻게 되나요?</p>
+    <p>무료 체험 1개월 후 월 9,900원 자동 갱신이며, 해지는 App Store 구독 관리에서 가능합니다. 해지해도 남은 이용 기간까지는 계속 쓸 수 있습니다.</p>
+    <p class="q">Q. 비밀번호를 잊었어요.</p>
+    <p>로그인 화면의 <span class="btn">비밀번호를 잊으셨나요?</span>를 눌러 재설정 메일을 받으세요. 로그인 상태에서는 <span class="menu">설정 › 비밀번호 변경</span>으로 바꿀 수 있습니다.</p>
+    <p class="q">Q. 직원 계정은 어떻게 만드나요?</p>
+    <p>대표님이 <span class="menu">설정 › 직원 관리</span>에서 전화번호로 직원을 등록하면, 직원은 그 번호로 <span class="btn">초대받은 직원</span> → <span class="btn">초대 확인하고 연결</span>을 통해 계정을 연결합니다.</p>
+  </article>
+
+
+  <!-- ══════════ 문의 ══════════ -->
+  <div class="section" id="contact-sec">
+    <h2>✉️ 문의하기</h2>
+  </div>
+  <article class="guide contact" id="contact">
+    <p>가이드에서 찾지 못한 내용이나 오류가 있으면 아래 이메일로 문의해 주세요. 영업일 기준 순차적으로 답변드립니다.</p>
+    <p class="email"><a href="mailto:help@cheongsoman.com">help@cheongsoman.com</a></p>
+  </article>
+
+  <footer>© 청소만 (비빅청소)</footer>
+
+</div>
+</body>
+</html>
