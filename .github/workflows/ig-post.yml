@@ -1,0 +1,70 @@
+name: 인스타 예약 게시
+
+# 5분마다 큐를 확인해 예약 시각이 지난 게시물만 올린다.
+#  · GitHub 문서: 스케줄은 최소 5분 간격이고 "start of every hour" 에 지연이 잦다.
+#    그래서 예약 시각은 정각을 피해 잡는다(prepare.mjs 기본값 21:37).
+#  · 공개 저장소는 60일간 저장소 활동이 없으면 스케줄이 자동 중지된다. 게시가 커밋을 남기지만
+#    한동안 게시가 없다면 Actions 탭에서 다시 켜야 할 수 있다.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '모의 실행(실제 게시 안 함)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ig-post
+  cancel-in-progress: false # 게시 도중에 끊기면 중복 게시 위험이 있어 취소하지 않는다
+
+permissions:
+  contents: write # 게시 결과(status/mediaId)를 queue.json 에 되쓰기 위해 필요
+
+jobs:
+  post:
+    # 포크된 저장소에서는 돌지 않게 막는다
+    if: github.repository == 'h31930491-cmd/cheongsoman-web-Public'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 올릴 게시물이 있는지 먼저 확인
+        id: check
+        run: |
+          if [ ! -f ig/queue.json ]; then
+            echo "due=0" >> "$GITHUB_OUTPUT"; echo "큐 파일 없음"; exit 0
+          fi
+          DUE=$(node -e "
+            const q=require('./ig/queue.json');
+            const now=Date.now();
+            const n=(q.items||[]).filter(i=>i.status==='pending'&&Date.parse(i.scheduledAt)<=now).length;
+            console.log(n);
+          ")
+          echo "due=$DUE" >> "$GITHUB_OUTPUT"
+          echo "지금 올릴 게시물: $DUE 건"
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.due != '0'
+        with:
+          node-version: '20'
+
+      - name: 게시
+        if: steps.check.outputs.due != '0'
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node .github/scripts/ig-post.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: 결과를 queue.json 에 기록
+        if: always() && steps.check.outputs.due != '0' && !inputs.dry_run
+        run: |
+          if [ -z "$(git status --porcelain ig/queue.json)" ]; then
+            echo "queue.json 변경 없음"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ig/queue.json
+          git commit -m "인스타: 게시 결과 기록 [skip ci]"
+          git push

@@ -1,0 +1,33 @@
+name: 인스타 토큰 갱신
+
+# 장기 토큰은 60일짜리고, 60일간 쓰지 않으면 만료돼 되살릴 수 없다(공식 문서).
+# 주 1회 갱신해 만료 사고를 막는다. 갱신 조건상 토큰은 최소 24시간 이상 된 것이어야 한다.
+on:
+  schedule:
+    - cron: '18 18 * * 1' # 매주 월요일 18:18 UTC = 화요일 03:18 KST (정각 회피)
+  workflow_dispatch:
+    inputs:
+      check_only:
+        description: '갱신하지 않고 토큰 상태만 확인'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    if: github.repository == 'h31930491-cmd/cheongsoman-web-Public'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 토큰 갱신 + 시크릿 되쓰기
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          # 기본 GITHUB_TOKEN 으로는 Secrets 를 쓸 수 없어 PAT 이 따로 필요하다.
+          GH_TOKEN: ${{ secrets.GH_PAT_SECRETS }}
+        run: node .github/scripts/ig-refresh-token.mjs ${{ inputs.check_only && '--check' || '' }}
