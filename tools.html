@@ -1,0 +1,398 @@
+
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>청소 문자 만들기 | 청소만</title>
+<meta name="description" content="고객명·날짜·서비스만 넣으면 예약확정, 방문전날, 완료·입금 안내 문자가 바로 만들어집니다. 가입 없이 무료로 쓰는 청소업 사장님용 문자 도구." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="청소 문자 만들기 | 가입 없이 무료" />
+<meta property="og:description" content="고객명·날짜·서비스만 넣으면 예약확정, 방문전날, 완료·입금 안내 문자가 바로 완성됩니다." />
+<meta property="og:site_name" content="청소만" />
+<meta name="theme-color" content="#0B6E6E" />
+<style>
+  :root { --teal:#0B6E6E; --teal-dark:#095959; --teal-soft:#E5F0EF; --ink:#17242B; --muted:#5B6B72;
+          --line:#E2E8E8; --bg:#F4F7F6; --amber:#B26A00; --amber-soft:#FFF4E0; --yellow:#FFD84D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fff; color:var(--ink);
+    font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',system-ui,sans-serif; line-height:1.7; }
+  .inner { max-width:680px; margin:0 auto; padding:0 20px; }
+  section { padding:36px 0; }
+  .sec-bg { background:var(--bg); }
+  h2 { font-size:22px; line-height:1.45; margin:0 0 6px; font-weight:800; }
+  p { font-size:16px; }
+  a { color:var(--teal); }
+
+  /* ══ 히어로 ══ */
+  .hero { background:var(--teal); color:#fff; text-align:center; padding:36px 0 32px; }
+  .hero .badge { display:inline-block; background:var(--yellow); color:#4A3600; font-weight:800;
+    font-size:15px; padding:7px 18px; border-radius:999px; margin-bottom:14px; }
+  .hero h1 { font-size:27px; line-height:1.4; font-weight:800; margin:0 0 12px; }
+  .hero .sub { color:#EAF5F4; font-size:15px; line-height:1.65; margin:0 auto; max-width:440px; }
+  .hero .home { display:inline-block; margin-top:16px; color:rgba(255,255,255,.9);
+    font-size:14px; text-decoration:none; border-bottom:1px solid rgba(255,255,255,.45); }
+
+  /* ══ 입력 폼 ══ */
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 18px; }
+  .field { margin-bottom:18px; }
+  .field:last-child { margin-bottom:0; }
+  .field label { display:block; font-size:15px; font-weight:800; margin:0 0 8px; }
+  .field .opt { color:var(--muted); font-weight:600; font-size:13.5px; }
+  input[type=text], input[type=date], input[type=time] {
+    width:100%; min-height:52px; font-size:16px; font-family:inherit; color:var(--ink);
+    padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:#fff; }
+  input:focus { outline:2px solid var(--teal); outline-offset:1px; border-color:var(--teal); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  /* 서비스 선택 : 라디오는 숨기고 라벨을 큰 버튼으로 (터치 영역 54px) */
+  .svc { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .svc input { position:absolute; opacity:0; width:0; height:0; }
+  .svc label { display:flex; align-items:center; justify-content:center; min-height:54px;
+    border:1px solid var(--line); border-radius:12px; background:var(--bg);
+    font-size:16px; font-weight:700; cursor:pointer; margin:0; text-align:center; }
+  .svc input:checked + label { background:var(--teal); border-color:var(--teal); color:#fff; }
+  .svc input:focus-visible + label { outline:2px solid var(--teal); outline-offset:2px; }
+
+  /* ══ 안내(저장 안 함) ══ */
+  .privacy { background:var(--teal-soft); color:var(--teal-dark); border:1px solid #C4DBD9;
+    border-radius:12px; padding:13px 16px; margin:16px 0 0; font-size:14.5px; line-height:1.6; font-weight:600; }
+
+  /* ══ 결과 ══ */
+  .out { background:#fff; border:1px solid var(--line); border-radius:16px;
+    padding:16px 16px 18px; margin-bottom:14px; }
+  .out-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .out-head h3 { font-size:17px; font-weight:800; margin:0; }
+  .btn-copy { flex:none; min-height:44px; padding:10px 18px; border:0; border-radius:10px;
+    background:var(--teal); color:#fff; font-size:15px; font-weight:800;
+    font-family:inherit; cursor:pointer; }
+  .btn-copy.done { background:var(--amber); }
+  .msg { margin:0; background:var(--bg); border:1px solid var(--line); border-radius:12px;
+    padding:15px 15px; font-family:inherit; font-size:15.5px; line-height:1.75;
+    white-space:pre-wrap; word-break:break-word; color:#22323A; }
+  .tip { color:var(--muted); font-size:13.5px; margin:10px 0 0; }
+  .lead-tip { color:var(--muted); font-size:13.5px; margin:0 0 16px; }
+
+  /* ══ 전환 ══ */
+  .conv { background:var(--teal); color:#fff; text-align:center; padding:44px 0 34px; }
+  .conv h2 { font-size:22px; margin:0 0 10px; }
+  .conv p { color:#EAF5F4; font-size:15.5px; margin:0 auto 22px; max-width:460px; }
+  .stores { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+  .btn-store { display:inline-block; background:#fff; color:var(--teal-dark); text-decoration:none;
+    font-size:17px; font-weight:800; padding:15px 30px; border-radius:12px; min-width:230px; }
+  .conv .note { color:rgba(255,255,255,.72); font-size:13.5px; margin:14px 0 0; }
+  .flinks { margin:32px 0 10px; padding-top:22px; border-top:1px solid rgba(255,255,255,.22);
+    display:flex; flex-wrap:wrap; justify-content:center; gap:8px 14px; font-size:14.5px; }
+  .flinks a { color:rgba(255,255,255,.92); text-decoration:none; }
+  .flinks a:hover { text-decoration:underline; }
+  .copyright { color:rgba(255,255,255,.68); font-size:13px; margin:14px 0 0; }
+
+  @media (min-width:560px) {
+    .hero h1 { font-size:31px; }
+    .svc { grid-template-columns:1fr 1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ 1. 히어로 ══════════ -->
+<div class="hero">
+  <div class="inner">
+    <span class="badge">가입 없이 무료</span>
+    <h1>청소 문자 만들기</h1>
+    <p class="sub">고객명과 날짜만 넣으면 예약확정, 방문 전날, 완료·입금 안내 문자가 바로 완성됩니다. 복사해서 문자나 카톡에 붙여넣으세요.</p>
+    <a class="home" href="/index.html">청소만 소개 보기</a>
+  </div>
+</div>
+
+<!-- ══════════ 2. 입력 ══════════ -->
+<section>
+  <div class="inner">
+    <h2>1. 예약 내용을 넣어주세요</h2>
+    <div class="card">
+      <div class="field">
+        <label for="f-name">고객명</label>
+        <input type="text" id="f-name" placeholder="예: 김철수" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label for="f-date">방문 날짜와 시간</label>
+        <div class="two">
+          <input type="date" id="f-date" aria-label="방문 날짜" />
+          <input type="time" id="f-time" aria-label="방문 시간" step="600" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="svc-air">서비스 종류</label>
+        <div class="svc">
+          <input type="radio" name="svc" id="svc-air" value="에어컨" checked /><label for="svc-air">에어컨</label>
+          <input type="radio" name="svc" id="svc-wash" value="세탁기" /><label for="svc-wash">세탁기</label>
+          <input type="radio" name="svc" id="svc-mat" value="매트리스" /><label for="svc-mat">매트리스</label>
+          <input type="radio" name="svc" id="svc-move" value="입주" /><label for="svc-move">입주청소</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-price">금액 <span class="opt">(선택, 비워두면 금액 문장이 빠집니다)</span></label>
+        <input type="text" id="f-price" inputmode="numeric" placeholder="예: 120000" autocomplete="off" />
+      </div>
+    </div>
+
+    <p class="privacy">🔒 입력하신 내용은 이 페이지(브라우저) 안에서만 처리됩니다. 서버로 전송되거나 저장되지 않으며, 창을 닫으면 사라집니다.</p>
+  </div>
+</section>
+
+<!-- ══════════ 3. 결과 ══════════ -->
+<section class="sec-bg">
+  <div class="inner">
+    <h2>2. 완성된 문자 3종</h2>
+    <p class="lead-tip">복사 버튼을 누른 뒤 문자앱이나 카톡에 붙여넣으세요.</p>
+
+    <div class="out">
+      <div class="out-head">
+        <h3>① 예약 확정 안내</h3>
+        <button type="button" class="btn-copy" data-target="msg-confirm">복사</button>
+      </div>
+      <pre class="msg" id="msg-confirm"></pre>
+    </div>
+
+    <div class="out">
+      <div class="out-head">
+        <h3>② 방문 전날 안내</h3>
+        <button type="button" class="btn-copy" data-target="msg-remind">복사</button>
+      </div>
+      <pre class="msg" id="msg-remind"></pre>
+    </div>
+
+    <div class="out">
+      <div class="out-head">
+        <h3>③ 완료·입금 안내</h3>
+        <button type="button" class="btn-copy" data-target="msg-done">복사</button>
+      </div>
+      <pre class="msg" id="msg-done"></pre>
+      <p class="tip">[계좌번호] 부분은 붙여넣은 뒤 사장님 계좌로 바꿔주세요.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 4. 전환 ══════════ -->
+<div class="conv">
+  <div class="inner">
+    <h2>예약을 등록하면 이 문자가 자동으로 채워집니다</h2>
+    <p>청소만 앱에서는 예약 하나만 등록해두면 고객명, 날짜, 금액, 계좌가 저절로 들어간 문자가 단계마다 준비됩니다. 보낸 문자는 기록으로 남아 나중에 분쟁이 생겨도 증거가 됩니다.</p>
+    <div class="stores">
+      <a class="btn-store" href="https://apps.apple.com/app/id6793058185" target="_blank" rel="noopener">App Store에서 시작</a>
+      <a class="btn-store" href="https://play.google.com/store/apps/details?id=com.cheongsoman.app" target="_blank" rel="noopener">Google Play에서 시작</a>
+    </div>
+    <p class="note">아이폰·안드로이드 모두 사용할 수 있어요</p>
+
+    <div class="flinks">
+      <a href="/index.html">청소만 소개</a>
+      <a href="/guide.html">사용가이드</a>
+      <a href="https://pf.kakao.com/_BxhxoxnX/chat" target="_blank" rel="noopener">💬 카카오톡 문의</a>
+      <a href="/privacy.html">개인정보처리방침</a>
+    </div>
+    <p class="copyright">마음홈케어 · 대표 강한샘</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // 서비스별 문구 : 앱(청소만)의 문자 템플릿 기본값과 같은 톤/내용을 쓴다.
+  var SVC = {
+    '에어컨': {
+      label: '에어컨 청소',
+      confirm: '[에어컨 안내] 작업 공간 주변 물품은 미리 치워주시면 작업이 빨라집니다. 청소 직후 며칠간 약한 냄새가 날 수 있는데 송풍 2~3시간이면 대부분 사라집니다. 10년 이상 노후 기기는 분해 중 파손될 수 있어 사전 촬영 후 진행 여부를 여쭙겠습니다.',
+      done: '[에어컨 관리] 냉방 후 끄기 전 송풍 30분! 필터는 2주에 1번 물세척 후 완전 건조해주세요. 전문 분해세척은 1~2년에 1회 권장드립니다.'
+    },
+    '세탁기': {
+      label: '세탁기 청소',
+      confirm: '[세탁기 안내] 분해 세척 후 첫 세탁은 빈 통 헹굼(통세척 코스) 1회를 권장드립니다. 이염 방지를 위해 첫 세탁은 흰 빨래를 피해주세요. 노후 기기는 분해 시 파손 위험이 있어 사전 확인 후 진행합니다.',
+      done: '[세탁기 관리] 세탁 후 도어를 열어 내부를 건조해주세요. 월 1회 세탁조 통세척을 권장드립니다. 세제는 정량만 사용해주세요.'
+    },
+    '매트리스': {
+      label: '매트리스 청소',
+      confirm: '[매트리스 안내] 작업 후 2~3시간 통풍 건조를 권장드립니다. 오래된 얼룩은 완전 제거가 어려울 수 있어 현장에서 상태 확인 후 안내드립니다.',
+      done: '[매트리스 관리] 2~3시간 통풍 건조 후 사용해주세요. 3개월에 1번 방향을 돌려 사용하면 꺼짐·오염을 줄일 수 있습니다.'
+    },
+    '입주': {
+      label: '입주청소',
+      confirm: '[입주청소 안내] 짐이 없는 공실 기준으로 작업하며 짐이 있으면 범위·금액이 달라질 수 있습니다. 전기·수도가 개통되어 있어야 작업이 가능합니다. 청소 후 환기·베이크아웃을 권장드립니다.',
+      done: '[입주 후 관리] 입주 후 2주간 하루 2회 이상 환기를 권장드립니다. 욕실 사용 후 물기를 제거하면 곰팡이 예방에 좋습니다.'
+    }
+  };
+
+  var DOW = ['일', '월', '화', '수', '목', '금', '토'];
+
+  var elName = document.getElementById('f-name');
+  var elDate = document.getElementById('f-date');
+  var elTime = document.getElementById('f-time');
+  var elPrice = document.getElementById('f-price');
+  var svcRadios = document.querySelectorAll('input[name="svc"]');
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  // 날짜 문자열(YYYY-MM-DD) → "9/3(목)". 값이 없거나 형식이 틀리면 빈 문자열.
+  function fmtDate(v) {
+    if (!v) return '';
+    var p = v.split('-');
+    if (p.length !== 3) return '';
+    var d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+    if (isNaN(d.getTime())) return '';
+    return (d.getMonth() + 1) + '/' + d.getDate() + '(' + DOW[d.getDay()] + ')';
+  }
+
+  // 시간 문자열(HH:MM) → "오전 10:00" / "오후 2:00"
+  function fmtTime(v) {
+    if (!v) return '';
+    var p = v.split(':');
+    if (p.length < 2) return '';
+    var h = Number(p[0]);
+    var m = Number(p[1]);
+    if (isNaN(h) || isNaN(m)) return '';
+    return (h < 12 ? '오전 ' : '오후 ') + (((h + 11) % 12) + 1) + ':' + pad2(m);
+  }
+
+  // 숫자만 남겨 천단위 콤마
+  function fmtMoney(v) {
+    var digits = String(v || '').replace(/[^0-9]/g, '');
+    if (!digits) return '';
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function pickedService() {
+    for (var i = 0; i < svcRadios.length; i++) {
+      if (svcRadios[i].checked) return svcRadios[i].value;
+    }
+    return '에어컨';
+  }
+
+  // 블록 배열을 빈 줄 하나로 이어붙이기(앱의 문자 합치기 방식과 동일)
+  function joinBlocks(blocks) {
+    var out = [];
+    for (var i = 0; i < blocks.length; i++) {
+      var s = (blocks[i] || '').trim();
+      if (s) out.push(s);
+    }
+    return out.join('\n\n');
+  }
+
+  function render() {
+    var svc = SVC[pickedService()] || SVC['에어컨'];
+    var name = (elName.value || '').trim() || '고객';
+    var date = fmtDate(elDate.value);
+    var time = fmtTime(elTime.value);
+    var money = fmtMoney(elPrice.value);
+
+    var when = [date, time].filter(function (x) { return !!x; }).join(' ');
+    var whenPart = when ? when + ' ' : '';
+
+    // ① 예약 확정 안내
+    var confirmMsg = joinBlocks([
+      name + ' 고객님, ' + whenPart + svc.label + ' 예약이 확정되었습니다.',
+      '일정 변경은 희망일 3일 전까지 1회 무료입니다.',
+      svc.confirm
+    ]);
+
+    // ② 방문 전날 안내
+    var remindHead = time
+      ? name + ' 고객님, 내일 ' + time + ' 방문 예정입니다.'
+      : name + ' 고객님, 내일 방문 예정입니다.';
+    var remindMsg = joinBlocks([
+      remindHead + ' 작업 공간 주변 물품을 미리 치워주시고 주차 가능 여부를 알려주시면 감사하겠습니다.'
+    ]);
+
+    // ③ 완료·입금 안내
+    var payLine = money
+      ? '결제 금액은 ' + money + '원입니다. 계좌이체는 [계좌번호]로 부탁드립니다. 현금영수증이 필요하시면 번호를 남겨주세요.'
+      : '계좌이체는 [계좌번호]로 부탁드립니다. 현금영수증이 필요하시면 번호를 남겨주세요.';
+    var doneMsg = joinBlocks([
+      name + ' 고객님, 오늘 ' + svc.label + ' 작업이 완료되었습니다. 작업 전/후 사진과 특이사항을 함께 보내드립니다.',
+      payLine,
+      svc.done
+    ]);
+
+    document.getElementById('msg-confirm').textContent = confirmMsg;
+    document.getElementById('msg-remind').textContent = remindMsg;
+    document.getElementById('msg-done').textContent = doneMsg;
+  }
+
+  // 복사 : 클립보드 API가 막힌 인앱 브라우저(카톡 등)를 위해 execCommand 폴백을 둔다.
+  function copyText(text, btn) {
+    function flash() {
+      btn.textContent = '복사됨';
+      btn.classList.add('done');
+      setTimeout(function () {
+        btn.textContent = '복사';
+        btn.classList.remove('done');
+      }, 1600);
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '0';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      var done = false;
+      try { done = document.execCommand('copy'); } catch (e) { done = false; }
+      document.body.removeChild(ta);
+      if (done) {
+        flash();
+      } else {
+        btn.textContent = '길게 눌러 복사';
+        setTimeout(function () { btn.textContent = '복사'; }, 2400);
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flash, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  var buttons = document.querySelectorAll('.btn-copy');
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener('click', function (e) {
+      var btn = e.currentTarget;
+      var el = document.getElementById(btn.getAttribute('data-target'));
+      copyText(el ? el.textContent : '', btn);
+    });
+  }
+
+  var inputs = [elName, elDate, elTime, elPrice];
+  for (var j = 0; j < inputs.length; j++) {
+    inputs[j].addEventListener('input', render);
+    inputs[j].addEventListener('change', render);
+  }
+  for (var k = 0; k < svcRadios.length; k++) {
+    svcRadios[k].addEventListener('change', render);
+  }
+
+  // 금액은 입력칸을 벗어날 때 콤마로 정리
+  elPrice.addEventListener('blur', function () {
+    var v = fmtMoney(elPrice.value);
+    if (v) elPrice.value = v;
+    render();
+  });
+
+  // 첫 화면 기본값 : 내일 오전 10시(들어오자마자 결과가 보이도록)
+  (function initDefaults() {
+    var t = new Date();
+    t.setDate(t.getDate() + 1);
+    elDate.value = t.getFullYear() + '-' + pad2(t.getMonth() + 1) + '-' + pad2(t.getDate());
+    elTime.value = '10:00';
+    render();
+  })();
+})();
+</script>
+
+</body>
+</html>
