@@ -1,5 +1,22 @@
 {
   "version": 1,
   "timezone": "Asia/Seoul",
-  "items": []
+  "items": [
+    {
+      "id": "2026-09-11-0853",
+      "scheduledAt": "2026-09-11T08:53:00+09:00",
+      "caption": "문의는 오는데 왜 안 남을까요?\n\n청소만은 문의부터 예약금, 확정, 완료까지 한 흐름으로 기록합니다.\n단골이 쌓이는 장부, 앱 하나로 정리하세요.\n\n첫 14일 무료\n프로필 링크에서 받아보실 수 있습니다.\n\n#청소만 #에어컨청소 #입주청소 #세탁기청소 #청소업 #사장님",
+      "images": [
+        "ig/2026-09-11/01.jpg",
+        "ig/2026-09-11/02.jpg"
+      ],
+      "mediaType": "CAROUSEL",
+      "status": "pending",
+      "attempts": 0,
+      "mediaId": null,
+      "permalink": null,
+      "postedAt": null,
+      "lastError": null
+    }
+  ]
 }
