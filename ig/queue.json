@@ -47,6 +47,23 @@
       "permalink": "https://www.instagram.com/p/DdJbvgIFkZe/",
       "postedAt": "2026-09-11T12:40:52.158Z",
       "lastError": null
+    },
+    {
+      "id": "2026-09-12-0910",
+      "scheduledAt": "2026-09-12T09:10:00+09:00",
+      "caption": "완료 누를 때 전 사진, 후 사진 두 장 찍으세요.\n\n완료 화면에서 두 장을 한 번에 카톡으로 보내면 끝이에요.\n\n\"깨끗해졌죠?\" 이 말 안 해도 됩니다.\n사진이 먼저 말하니까요.\n\n고객 카드에 날짜별로 남아서\n다음에 문의 오면 지난번 사진부터 꺼내 보면 됩니다.\n\n첫 14일 무료.\n\n#청소업 #에어컨청소 #청소업사장님 #입주청소 #청소만",
+      "images": [
+        "ig/2026-09-12-0910/01.jpg",
+        "ig/2026-09-12-0910/02.jpg",
+        "ig/2026-09-12-0910/03.jpg"
+      ],
+      "mediaType": "CAROUSEL",
+      "status": "pending",
+      "attempts": 0,
+      "mediaId": null,
+      "permalink": null,
+      "postedAt": null,
+      "lastError": null
     }
   ]
 }
