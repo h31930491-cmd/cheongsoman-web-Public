@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
+<meta http-equiv="Cache-Control" content="no-store, max-age=0" />
 <title>작업 리포트 · 청소만</title>
 <style>
   :root{
@@ -76,6 +77,8 @@ function photoUrl(bucket, path){
 function rpc(fn, body){
   return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fn, {
     method: 'POST',
+    // 조회 결과를 브라우저가 재사용하지 않게 한다(사진을 추가해도 옛 내용이 뜨는 것 방지).
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
       apikey: SUPABASE_ANON_KEY,
