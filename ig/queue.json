@@ -58,11 +58,28 @@
         "ig/2026-09-12-0910/03.jpg"
       ],
       "mediaType": "CAROUSEL",
-      "status": "posted",
+      "status": "deleted",
       "attempts": 0,
       "mediaId": "18353004592175439",
       "permalink": "https://www.instagram.com/p/DdKqukgmP5p/",
       "postedAt": "2026-09-12T00:11:03.356Z",
+      "lastError": null
+    },
+    {
+      "id": "2026-09-12-0955",
+      "scheduledAt": "2026-09-12T09:55:00+09:00",
+      "caption": "전후 사진, 현장에서 찍은 만큼 다 넣으세요.\n두 장 제한 그런 거 없습니다.\n\n완료 누르고 카톡 공유 누르면 그대로 날아갑니다.\n\"깨끗해졌죠?\" 할 필요가 없어요.\n고객이 사진 보고 먼저 \"와\" 합니다.\n\n그리고 이게 고객 카드에 날짜별로 쌓여요.\n반년 뒤에 그 집에서 또 연락 오면\n지난번 사진 열고 시작하면 됩니다.\n\n첫 14일 무료.\n\n#청소업 #에어컨청소 #청소업사장님 #입주청소 #청소만",
+      "images": [
+        "ig/2026-09-12-0955/01.jpg",
+        "ig/2026-09-12-0955/02.jpg",
+        "ig/2026-09-12-0955/03.jpg"
+      ],
+      "mediaType": "CAROUSEL",
+      "status": "pending",
+      "attempts": 0,
+      "mediaId": null,
+      "permalink": null,
+      "postedAt": null,
       "lastError": null
     }
   ]
