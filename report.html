@@ -140,12 +140,28 @@ function render(d){
 
 viewer.addEventListener('click', function(){ viewer.style.display = 'none'; });
 
+// 실패 원인을 구분해서 보여준다.
+//  예전에는 무엇이 잘못됐든 '링크가 만료되었거나 올바르지 않아요' 한 줄이라, 서버 설정이 덜 된 것인지
+//  토큰이 잘못된 것인지 구분할 수 없었다(실측 사고: report_payload 함수 미생성인데 '만료'로 보임).
 if(!token){
   state('주소가 올바르지 않아요. 받으신 링크를 다시 확인해주세요.');
 } else {
   rpc('report_payload', { p_token: token })
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(d){
+    .then(function(r){
+      return r.text().then(function(body){ return { ok: r.ok, status: r.status, body: body }; });
+    })
+    .then(function(res){
+      if(!res.ok){
+        // PGRST202 = 함수가 아직 없음(서버 설정 미완료). 토큰 문제가 아니다.
+        var setupMissing = res.status === 404 || res.body.indexOf('PGRST202') >= 0;
+        console.error('[report] 조회 실패', res.status, res.body);
+        state(setupMissing
+          ? '리포트 준비가 아직 끝나지 않았어요. 업체에 알려주세요. (설정 미완료)'
+          : '리포트를 불러오지 못했어요. 잠시 후 다시 열어주세요. (' + res.status + ')');
+        return;
+      }
+      var d = null;
+      try { d = JSON.parse(res.body); } catch(e){ d = null; }
       if(!d){
         state('링크가 만료되었거나 올바르지 않아요. 업체에 문의해주세요.');
         return;
@@ -154,8 +170,9 @@ if(!token){
       // 열람 기록. 실패해도 페이지는 그대로 보인다.
       rpc('report_log_view', { p_token: token, p_ua: navigator.userAgent }).catch(function(){});
     })
-    .catch(function(){
-      state('리포트를 불러오지 못했어요. 잠시 후 다시 열어주세요.');
+    .catch(function(e){
+      console.error('[report] 네트워크 오류', e);
+      state('리포트를 불러오지 못했어요. 인터넷 연결을 확인하고 다시 열어주세요.');
     });
 }
 </script>
