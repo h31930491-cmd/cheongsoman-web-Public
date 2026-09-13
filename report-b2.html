@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<meta http-equiv="Cache-Control" content="no-store, max-age=0" />
+<title>작업 리포트 · 청소만</title>
+<style>
+  :root{
+    --primary:#0B6E6E; --accent:#B26A00; --danger:#C6402E;
+    --bg:#F4F7F6; --ink:#17242B; --muted:#6B7780; --line:#E3E9E7; --white:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+       font-size:17px;line-height:1.6;-webkit-text-size-adjust:100%}
+  .wrap{max-width:720px;margin:0 auto;padding:20px 16px 56px}
+  header{padding:24px 0 16px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .biz{font-size:15px;color:var(--primary);font-weight:800;letter-spacing:.02em}
+  h1{font-size:26px;font-weight:800;margin:6px 0 4px}
+  .meta{font-size:15px;color:var(--muted)}
+  .memo{margin-top:12px;background:var(--white);border:1px solid var(--line);border-radius:12px;
+        padding:14px 16px;font-size:16px;white-space:pre-wrap}
+  .card{background:var(--white);border-radius:14px;padding:18px 16px;margin-bottom:16px;
+        border:1px solid var(--line)}
+  h2{font-size:19px;font-weight:800;margin:0 0 4px}
+  .count{font-size:14px;color:var(--muted);font-weight:600}
+  .note{background:var(--bg);border-radius:10px;padding:12px 14px;margin:12px 0 0;font-size:16px}
+  .note b{color:var(--accent);display:block;font-size:14px;margin-bottom:2px}
+  .phase{font-size:15px;font-weight:800;color:var(--muted);margin:16px 0 8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .grid img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;
+            background:var(--line);display:block;cursor:zoom-in}
+  .empty{font-size:15px;color:var(--muted);padding:8px 0}
+  footer{text-align:center;font-size:14px;color:var(--muted);padding-top:24px}
+  footer a{color:var(--primary)}
+  .state{text-align:center;padding:64px 16px;color:var(--muted);font-size:17px}
+  /* 크게 보기 */
+  #viewer{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;
+          align-items:center;justify-content:center;padding:16px;cursor:zoom-out;z-index:9}
+  #viewer img{max-width:100%;max-height:100%;object-fit:contain}
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#121A1E;--ink:#E8EEF0;--muted:#95A1A8;--line:#26333A;--white:#18232A}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="app"><div class="state">불러오는 중…</div></div>
+</div>
+<div id="viewer"><img alt="" /></div>
+
+<script>
+// 작업 리포트 공개 페이지.
+//  · 이 페이지는 토큰 하나로만 열린다. 토큰이 없으면 아무것도 조회하지 않는다.
+//  · 조회는 Edge Function 'report' 하나만 부른다(GET /functions/v1/report?t=토큰).
+//    그 함수가 service role 로 읽어 공개해도 되는 필드만 내보내므로, 이 페이지는 DB 에 직접 닿지 않는다.
+//  · 사진은 함수가 발급한 '서명 URL' 이 그대로 온다 → 페이지는 주소를 조립하지 않는다.
+//  · 열람 기록도 함수가 남긴다 → 페이지에서 따로 기록하지 않는다.
+//  · 담기지 않는 것: 주소 · 연락처 · 금액 · 예약금 · 담당자 · 예약 id.
+var SUPABASE_URL = 'https://lwxginyeelrendbnqapa.supabase.co';
+// 공개(anon) 키. 앱에도 그대로 들어가는 공개 값이다. RLS 와 함수 권한이 실제 통제를 한다.
+var REPORT_FN_URL = 'https://lwxginyeelrendbnqapa.supabase.co/functions/v1/report';
+var SUPABASE_ANON_KEY = 'sb_publishable_Wu4dBo0TrJPmM7BAolmUaQ_VKMsnJUJ';
+
+var token = new URLSearchParams(location.search).get('t') || '';
+var app = document.getElementById('app');
+var viewer = document.getElementById('viewer');
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+
+function state(msg){ app.innerHTML = '<div class="state">' + esc(msg) + '</div>'; }
+
+// Edge Function 'report' 호출. 조회 결과를 브라우저가 재사용하지 않게 no-store.
+function callReport(token){
+  return fetch(REPORT_FN_URL + '?t=' + encodeURIComponent(token), {
+    method: 'GET',
+    cache: 'no-store',
+    headers: { apikey: SUPABASE_ANON_KEY }
+  });
+}
+
+function grid(urls){
+  if(!urls || urls.length === 0) return '<div class="empty">사진이 없어요.</div>';
+  return '<div class="grid">' + urls.map(function(u){
+    return '<img loading="lazy" alt="작업 사진" src="' + esc(u) + '">';
+  }).join('') + '</div>';
+}
+
+function block(title, note, before, after){
+  var n = (before ? before.length : 0) + (after ? after.length : 0);
+  var h = '<section class="card"><h2>' + esc(title) + '</h2>' +
+          '<div class="count">사진 ' + n + '장</div>';
+  if(note) h += '<div class="note"><b>특이사항</b>' + esc(note) + '</div>';
+  h += '<div class="phase">작업 전</div>' + grid(before);
+  h += '<div class="phase">작업 후</div>' + grid(after);
+  return h + '</section>';
+}
+
+function render(d){
+  var h = '<header>' +
+          '<div class="biz">' + esc(d.business || '청소만') + '</div>' +
+          '<h1>작업 리포트</h1>' +
+          '<div class="meta">' + esc(d.customer || '고객님') + ' · ' + esc(d.date || '') + '</div>' +
+          (d.note ? '<div class="memo">' + esc(d.note) + '</div>' : '') +
+          '</header>';
+
+  var zones = d.zones || [];
+  for(var i = 0; i < zones.length; i++){
+    var z = zones[i];
+    h += block(z.name, z.note, z.before, z.after);
+  }
+
+  var u = d.unzoned || {};
+  var un = (u.before || []).length + (u.after || []).length;
+  if(un > 0) h += block(zones.length ? '그 외 사진' : '작업 사진', '', u.before, u.after);
+
+  if(zones.length === 0 && un === 0)
+    h += '<section class="card"><div class="empty">아직 등록된 사진이 없어요.</div></section>';
+
+  h += '<footer>청소만으로 작성된 작업 리포트입니다.<br>' +
+       '<a href="https://cheongsoman.com">cheongsoman.com</a></footer>';
+  app.innerHTML = h;
+
+  // 사진 크게 보기
+  app.addEventListener('click', function(e){
+    if(e.target && e.target.tagName === 'IMG'){
+      viewer.querySelector('img').src = e.target.src;
+      viewer.style.display = 'flex';
+    }
+  });
+}
+
+viewer.addEventListener('click', function(){ viewer.style.display = 'none'; });
+
+// 실패 원인을 구분해서 보여준다.
+//  예전에는 무엇이 잘못됐든 '링크가 만료되었거나 올바르지 않아요' 한 줄이라, 서버 설정이 덜 된 것인지
+//  토큰이 잘못된 것인지 구분할 수 없었다.
+if(!token){
+  state('주소가 올바르지 않아요. 받으신 링크를 다시 확인해주세요.');
+} else {
+  callReport(token)
+    .then(function(r){
+      return r.text().then(function(body){ return { ok: r.ok, status: r.status, body: body }; });
+    })
+    .then(function(res){
+      if(!res.ok){
+        // 404 = Edge Function 이 배포되지 않음(서버 설정 미완료). 토큰 문제가 아니다.
+        var setupMissing = res.status === 404;
+        console.error('[report] 조회 실패', res.status, res.body);
+        state(setupMissing
+          ? '리포트 준비가 아직 끝나지 않았어요. 업체에 알려주세요. (설정 미완료)'
+          : '리포트를 불러오지 못했어요. 잠시 후 다시 열어주세요. (' + res.status + ')');
+        return;
+      }
+      var d = null;
+      try { d = JSON.parse(res.body); } catch(e){ d = null; }
+      if(!d){
+        state('링크가 만료되었거나 올바르지 않아요. 업체에 문의해주세요.');
+        return;
+      }
+      // 열람 기록은 Edge Function 이 이미 남겼다(페이지에서 따로 부르지 않는다).
+      render(d);
+    })
+    .catch(function(e){
+      console.error('[report] 네트워크 오류', e);
+      state('리포트를 불러오지 못했어요. 인터넷 연결을 확인하고 다시 열어주세요.');
+    });
+}
+</script>
+</body>
+</html>
