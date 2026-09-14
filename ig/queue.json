@@ -118,6 +118,26 @@
       "permalink": "https://www.instagram.com/p/DdQT1FQEXfX/",
       "postedAt": "2026-09-14T04:46:25.798Z",
       "lastError": null
+    },
+    {
+      "id": "2026-09-14-2100",
+      "scheduledAt": "2026-09-14T21:00:00+09:00",
+      "caption": "청소만은 컴퓨터에서도 쓸 수 있습니다.\n\n브라우저 주소창에 app.cheongsoman.com 치고 휴대폰과 같은 계정으로 로그인하시면 됩니다.\n\n현장에서 폰으로 등록한 예약이랑 사진, 구역 메모, 매출이 PC에 그대로 떠 있습니다.\n\n작업 리포트도 PC에서 링크 복사해서 보낼 수 있습니다.\n\n매출이랑 경비를 엑셀로 뽑는 건 아무래도 PC가 편합니다.\n\n현장에선 폰으로, 정리는 컴퓨터로 하시면 됩니다.\n\n14일 무료로 먼저 써보세요. 이후 월 9,900원.\n\n#청소업 #청소만 #매출관리 #청소업사장님 #PC버전",
+      "images": [
+        "ig/2026-09-14-2100/01.jpg",
+        "ig/2026-09-14-2100/02.jpg",
+        "ig/2026-09-14-2100/03.jpg",
+        "ig/2026-09-14-2100/04.jpg",
+        "ig/2026-09-14-2100/05.jpg",
+        "ig/2026-09-14-2100/06.jpg"
+      ],
+      "mediaType": "CAROUSEL",
+      "status": "pending",
+      "attempts": 0,
+      "mediaId": null,
+      "permalink": null,
+      "postedAt": null,
+      "lastError": null
     }
   ]
 }
