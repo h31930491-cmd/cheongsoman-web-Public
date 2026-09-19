@@ -262,17 +262,17 @@
       ],
       "mediaType": "CAROUSEL",
       "status": "pending",
-      "attempts": 0,
+      "attempts": 1,
       "mediaId": null,
       "permalink": null,
       "postedAt": null,
-      "lastError": null,
+      "lastError": "POST 17841440997957606/media_publish 실패 (HTTP 400) code=9007 sub=2207027: Media ID is not available",
       "threads": {
         "enabled": true,
-        "status": "pending",
-        "mediaId": null,
-        "permalink": null,
-        "postedAt": null,
+        "status": "posted",
+        "mediaId": "18331722913273734",
+        "permalink": "https://www.threads.com/@cheo.ngsoman/post/DdfCYFKkTPp",
+        "postedAt": "2026-09-19T22:02:33.517Z",
         "attempts": 0,
         "lastError": null
       }
