@@ -240,10 +240,10 @@
       "lastError": null,
       "threads": {
         "enabled": true,
-        "status": "pending",
-        "mediaId": null,
-        "permalink": null,
-        "postedAt": null,
+        "status": "posted",
+        "mediaId": "18119447990291765",
+        "permalink": "https://www.threads.com/@cheo.ngsoman/post/Ddd_3nDoGic",
+        "postedAt": "2026-09-19T12:21:22.628Z",
         "attempts": 0,
         "lastError": null
       }
