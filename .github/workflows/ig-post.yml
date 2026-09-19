@@ -92,6 +92,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ig/queue.json ig/threads-check.json
+          git add ig/queue.json
+          [ -f ig/threads-check.json ] && git add ig/threads-check.json || true
           git commit -m "인스타·스레드: 게시 결과 기록 [skip ci]"
           git push
