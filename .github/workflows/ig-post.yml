@@ -14,6 +14,11 @@ on:
         description: '모의 실행(실제 게시 안 함)'
         type: boolean
         default: false
+      threads_probe:
+        description: '스레드 점검: check=토큰만 / probe=토큰+사진+컨테이너 생성(게시 안 함). 결과는 ig/threads-check.json'
+        type: choice
+        options: ['none', 'check', 'probe']
+        default: 'none'
 
 concurrency:
   group: ig-post
@@ -36,14 +41,19 @@ jobs:
           if [ ! -f ig/queue.json ]; then
             echo "due=0" >> "$GITHUB_OUTPUT"; echo "큐 파일 없음"; exit 0
           fi
+          # 인스타(status) 또는 스레드(threads.status) 어느 한쪽이라도 올릴 게 있으면 진행한다.
           DUE=$(node -e "
             const q=require('./ig/queue.json');
             const now=Date.now();
-            const n=(q.items||[]).filter(i=>i.status==='pending'&&Date.parse(i.scheduledAt)<=now).length;
-            console.log(n);
+            const due=(i)=>Date.parse(i.scheduledAt)<=now;
+            const ig=(q.items||[]).filter(i=>i.status==='pending'&&due(i)).length;
+            const th=(q.items||[]).filter(i=>i.threads&&i.threads.enabled&&i.threads.status==='pending'&&due(i)).length;
+            console.log(ig+th);
           ")
+          PROBE="${{ inputs.threads_probe }}"
+          if [ "$DUE" = "0" ] && [ -n "$PROBE" ] && [ "$PROBE" != "none" ]; then DUE=probe; fi
           echo "due=$DUE" >> "$GITHUB_OUTPUT"
-          echo "지금 올릴 게시물: $DUE 건"
+          echo "지금 올릴 게시물(인스타+스레드): $DUE 건"
 
       - uses: actions/setup-node@v4
         if: steps.check.outputs.due != '0'
@@ -51,20 +61,37 @@ jobs:
           node-version: '20'
 
       - name: 게시
-        if: steps.check.outputs.due != '0'
+        if: steps.check.outputs.due != '0' && steps.check.outputs.due != 'probe'
         env:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: node .github/scripts/ig-post.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
 
+      # 스레드 — 인스타 단계가 실패해도 진행한다(always). 같은 queue.json 의 threads 필드만 바꾼다.
+      - name: 스레드 게시
+        if: always() && steps.check.outputs.due != '0' && steps.check.outputs.due != 'probe'
+        env:
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: node .github/scripts/th-post.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      # 수동 점검(workflow_dispatch threads_probe=check|probe) — 게시하지 않고 토큰·사진·컨테이너만 확인해 ig/threads-check.json 에 기록
+      - name: 스레드 점검
+        if: steps.check.outputs.due == 'probe'
+        env:
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+        run: node .github/scripts/th-post.mjs ${{ inputs.threads_probe == 'probe' && '--probe' || '--check' }}
+
+      # 인스타·스레드 결과(+점검 결과)를 한 번의 커밋·push 로 기록한다(두 번 push 하면 충돌).
       - name: 결과를 queue.json 에 기록
         if: always() && steps.check.outputs.due != '0' && !inputs.dry_run
         run: |
-          if [ -z "$(git status --porcelain ig/queue.json)" ]; then
-            echo "queue.json 변경 없음"; exit 0
+          if [ -z "$(git status --porcelain ig/queue.json ig/threads-check.json)" ]; then
+            echo "queue.json / threads-check.json 변경 없음"; exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ig/queue.json
-          git commit -m "인스타: 게시 결과 기록 [skip ci]"
+          git add ig/queue.json ig/threads-check.json
+          git commit -m "인스타·스레드: 게시 결과 기록 [skip ci]"
           git push

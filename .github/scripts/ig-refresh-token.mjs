@@ -6,19 +6,29 @@
 // 즉 한 번 만료되면 사장님이 처음부터 다시 발급받아야 한다. 주 1회 갱신으로 그 사고를 막는다.
 //
 // 환경변수:
-//   IG_ACCESS_TOKEN  현재 장기 토큰
+//   IG_ACCESS_TOKEN  현재 장기 토큰 (--platform threads 면 THREADS_ACCESS_TOKEN)
 //   GH_TOKEN         저장소 Secrets 를 쓸 수 있는 PAT (gh CLI 가 사용)
 //   GITHUB_REPOSITORY  owner/repo (Actions 가 자동으로 넣어준다)
 // 옵션: --dry-run  갱신만 하고 시크릿은 건드리지 않음 / --check 토큰 유효기간만 조회
+//       --platform threads  스레드 토큰(graph.threads.net, grant_type=th_refresh_token, 시크릿 THREADS_ACCESS_TOKEN).
+//                           기본은 instagram — 인스타 쪽 동작은 그대로다(같은 스크립트를 두 번 부른다, 사본 없음).
 import { execFileSync } from 'node:child_process';
 
-const SECRET_NAME = 'IG_ACCESS_TOKEN';
+// 플랫폼별로 다른 것은 호스트·grant_type·시크릿 이름·확인 호출뿐. 문서: Threads 는 GET graph.threads.net/refresh_access_token?grant_type=th_refresh_token
+const platformArg = process.argv[process.argv.indexOf('--platform') + 1];
+const PLATFORM = process.argv.includes('--platform') && platformArg === 'threads' ? 'threads' : 'instagram';
+const P =
+  PLATFORM === 'threads'
+    ? { host: 'https://graph.threads.net', grant: 'th_refresh_token', secret: 'THREADS_ACCESS_TOKEN', label: '스레드' }
+    : { host: 'https://graph.instagram.com', grant: 'ig_refresh_token', secret: 'IG_ACCESS_TOKEN', label: '인스타' };
+
+const SECRET_NAME = P.secret;
 const dryRun = process.argv.includes('--dry-run');
 const checkOnly = process.argv.includes('--check');
 
-const token = process.env.IG_ACCESS_TOKEN;
+const token = process.env[SECRET_NAME];
 if (!token) {
-  console.error('IG_ACCESS_TOKEN 이 없습니다.');
+  console.error(`${SECRET_NAME} 이 없습니다.`);
   process.exit(1);
 }
 
@@ -26,8 +36,8 @@ if (!token) {
 const brief = (t) => `${t.slice(0, 6)}...${t.slice(-4)} (길이 ${t.length})`;
 
 async function refresh() {
-  const u = new URL('https://graph.instagram.com/refresh_access_token');
-  u.searchParams.set('grant_type', 'ig_refresh_token');
+  const u = new URL(`${P.host}/refresh_access_token`);
+  u.searchParams.set('grant_type', P.grant);
   u.searchParams.set('access_token', token);
   const res = await fetch(u);
   const json = await res.json().catch(() => ({}));
@@ -39,11 +49,11 @@ async function refresh() {
 }
 
 async function main() {
-  console.log(`현재 토큰: ${brief(token)}`);
+  console.log(`[${P.label}] 현재 토큰: ${brief(token)}`);
 
   if (checkOnly) {
     // debug_token 은 Instagram Login 토큰에서 항상 열려 있지 않아, 유효성 확인은 가벼운 호출로 대신한다.
-    const res = await fetch(`https://graph.instagram.com/me?fields=id,username&access_token=${token}`);
+    const res = await fetch(`${P.host}/me?fields=id,username&access_token=${token}`);
     const j = await res.json().catch(() => ({}));
     if (!res.ok || j.error) {
       console.error('토큰이 유효하지 않습니다:', j.error?.message ?? `HTTP ${res.status}`);
