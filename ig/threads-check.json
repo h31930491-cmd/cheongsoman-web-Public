@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-09-19T11:59:24.279Z",
+  "mode": "probe",
+  "token": {
+    "ok": true,
+    "id": "28359070363759900",
+    "username": "cheo.ngsoman",
+    "matchesUserId": true
+  },
+  "image": {
+    "ok": true,
+    "item": "2026-09-21-0700",
+    "count": 6
+  },
+  "container": {
+    "ok": true,
+    "item": "2026-09-21-0700",
+    "creationId": "18103397189093246",
+    "note": "게시하지 않음 — 24시간 뒤 자동 만료"
+  },
+  "limit": {
+    "used": 0,
+    "total": 250
+  }
+}
