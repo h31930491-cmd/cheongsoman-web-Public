@@ -261,12 +261,12 @@
         "ig/2026-09-20-0700/06.jpg"
       ],
       "mediaType": "CAROUSEL",
-      "status": "pending",
+      "status": "posted",
       "attempts": 1,
-      "mediaId": null,
-      "permalink": null,
-      "postedAt": null,
-      "lastError": "POST 17841440997957606/media_publish 실패 (HTTP 400) code=9007 sub=2207027: Media ID is not available",
+      "mediaId": "17902297902574930",
+      "permalink": "https://www.instagram.com/p/DdfCzbUFn-U/",
+      "postedAt": "2026-09-19T22:06:14.145Z",
+      "lastError": null,
       "threads": {
         "enabled": true,
         "status": "posted",
