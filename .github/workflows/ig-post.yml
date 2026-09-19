@@ -15,9 +15,9 @@ on:
         type: boolean
         default: false
       threads_probe:
-        description: '스레드 점검: check=토큰만 / probe=토큰+사진+컨테이너 생성(게시 안 함). 결과는 ig/threads-check.json'
+        description: '스레드 점검: check=토큰만 / probe=컨테이너 생성까지(게시 안 함) / test-post=사진 1장 실제 게시(큐 무접촉, 나중에 삭제). 결과는 ig/threads-check.json'
         type: choice
-        options: ['none', 'check', 'probe']
+        options: ['none', 'check', 'probe', 'test-post']
         default: 'none'
 
 concurrency:
@@ -81,7 +81,7 @@ jobs:
         env:
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-        run: node .github/scripts/th-post.mjs ${{ inputs.threads_probe == 'probe' && '--probe' || '--check' }}
+        run: node .github/scripts/th-post.mjs ${{ inputs.threads_probe == 'test-post' && '--test-post' || inputs.threads_probe == 'probe' && '--probe' || '--check' }}
 
       # 인스타·스레드 결과(+점검 결과)를 한 번의 커밋·push 로 기록한다(두 번 push 하면 충돌).
       - name: 결과를 queue.json 에 기록

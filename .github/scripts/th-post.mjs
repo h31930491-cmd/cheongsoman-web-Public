@@ -10,6 +10,7 @@
 // 옵션:  --dry-run   실제 호출 없이 무엇을 올릴지만 출력
 //        --check     토큰 확인(GET /me)만 하고 끝. 결과를 ig/threads-check.json 에 기록
 //        --probe     토큰 확인 + 다음 대기 항목의 사진으로 컨테이너 생성까지만(게시 안 함, 24시간 뒤 만료) + 결과 기록
+//        --test-post 큐를 읽지도 쓰지도 않고 사진 1장(TEST_IMAGE_URL)을 고정 본문으로 실제 게시(연동 확인용, 게시 후 손으로 삭제). 결과 기록
 import fs from 'node:fs';
 import path from 'node:path';
 import { checkImageUrl } from './ig-api.mjs'; // 공개·JPEG 확인은 인스타와 같은 검사(사본 만들지 않음)
@@ -34,6 +35,9 @@ const CHECK_PATH = path.resolve(process.env.TH_CHECK_FILE || 'ig/threads-check.j
 const dryRun = process.argv.includes('--dry-run');
 const checkOnly = process.argv.includes('--check');
 const probe = process.argv.includes('--probe');
+const testPost = process.argv.includes('--test-post');
+const TEST_IMAGE_URL = process.env.TH_TEST_IMAGE_URL || 'https://cheongsoman.com/ig/2026-09-21-0700/01.jpg'; // 이미 공개된 사진
+const TEST_TEXT = '청소만 스레드 연동 테스트입니다. 곧 지웁니다.';
 
 function log(...a) {
   console.log(...a);
@@ -162,10 +166,40 @@ async function runCheck(q, userId, token) {
   return 0;
 }
 
+/** --test-post: 큐 무접촉. 사진 1장 + 고정 본문으로 실제 게시해 연동을 확인한다. permalink·id 출력 + 결과 기록. */
+async function runTestPost(userId, token) {
+  const result = { checkedAt: new Date().toISOString(), mode: 'test-post', image: TEST_IMAGE_URL, text: TEST_TEXT, post: null };
+  try {
+    await checkImageUrl(TEST_IMAGE_URL);
+    const creationId = await createSingleImage(userId, TEST_IMAGE_URL, TEST_TEXT, token);
+    log(`테스트 컨테이너 생성 (${creationId})`);
+    await waitReady(creationId, token);
+    const mediaId = await publish(userId, creationId, token);
+    const permalink = await getPermalink(mediaId, token);
+    result.post = { ok: true, mediaId, permalink, postedAt: new Date().toISOString() };
+    log(`✔ 테스트 게시 완료 id=${mediaId} permalink=${permalink ?? '(조회 실패)'}`);
+    log('  확인 후 스레드 앱에서 직접 삭제하세요.');
+  } catch (e) {
+    result.post = { ok: false, error: String(e.message || e).slice(0, 500) };
+    log(`✖ 테스트 게시 실패: ${result.post.error}`);
+  }
+  writeCheck(result);
+  return result.post.ok ? 0 : 1;
+}
+
 async function main() {
-  const q = loadQueue();
   const userId = process.env.THREADS_USER_ID;
   const token = process.env.THREADS_ACCESS_TOKEN;
+
+  if (testPost) {
+    if (!userId || !token) {
+      console.error('THREADS_USER_ID / THREADS_ACCESS_TOKEN 이 없습니다. 저장소 Secrets 를 확인하세요.');
+      return 1;
+    }
+    return runTestPost(userId, token); // queue.json 은 읽지도 쓰지도 않는다
+  }
+
+  const q = loadQueue();
 
   if (checkOnly || probe) {
     if (!userId || !token) {
