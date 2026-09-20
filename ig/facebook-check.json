@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-09-20T12:06:25.228Z",
+  "mode": "test-post",
+  "image": "https://cheongsoman.com/ig/2026-09-21-0700/01.jpg",
+  "text": "청소만 페이스북 연동 테스트입니다. 곧 지웁니다.",
+  "post": {
+    "ok": false,
+    "error": "POST \t1252744001260789/photos 실패 (HTTP 403) code=200 sub=-: (#200) The permission(s) publish_actions are not available. It has been deprecated. If you want to provide a way for your app users to share content to Facebook, we encourage you to use our Sharing products instead."
+  }
+}
