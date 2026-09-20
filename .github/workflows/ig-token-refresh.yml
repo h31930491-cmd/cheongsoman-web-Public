@@ -1,4 +1,4 @@
-name: 인스타·스레드 토큰 갱신
+name: 인스타·스레드 토큰 갱신 + 페이스북 토큰 확인
 
 # 장기 토큰은 60일짜리고, 60일간 쓰지 않으면 만료돼 되살릴 수 없다(공식 문서).
 # 주 1회 갱신해 만료 사고를 막는다. 갱신 조건상 토큰은 최소 24시간 이상 된 것이어야 한다.
@@ -39,3 +39,11 @@ jobs:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_PAT_SECRETS }}
         run: node .github/scripts/ig-refresh-token.mjs --platform threads ${{ inputs.check_only && '--check' || '' }}
+
+      # 페이스북 페이지 토큰은 만료가 없다(문서) — 갱신 대신 유효성만 확인해 로그에 남긴다(무효면 이 단계가 실패로 표시).
+      - name: 페이스북 페이지 토큰 확인
+        if: always()
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: node .github/scripts/fb-post.mjs --check

@@ -304,6 +304,15 @@
         "postedAt": null,
         "attempts": 0,
         "lastError": null
+      },
+      "facebook": {
+        "enabled": true,
+        "status": "pending",
+        "postId": null,
+        "permalink": null,
+        "postedAt": null,
+        "attempts": 0,
+        "lastError": null
       }
     }
   ]

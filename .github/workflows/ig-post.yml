@@ -19,6 +19,11 @@ on:
         type: choice
         options: ['none', 'check', 'probe', 'test-post']
         default: 'none'
+      facebook_probe:
+        description: '페이스북 점검: check=페이지·토큰만 / probe=사진 업로드까지(게시 안 함) / test-post=사진 1장 실제 게시(큐 무접촉). 결과는 ig/facebook-check.json'
+        type: choice
+        options: ['none', 'check', 'probe', 'test-post']
+        default: 'none'
 
 concurrency:
   group: ig-post
@@ -48,12 +53,14 @@ jobs:
             const due=(i)=>Date.parse(i.scheduledAt)<=now;
             const ig=(q.items||[]).filter(i=>i.status==='pending'&&due(i)).length;
             const th=(q.items||[]).filter(i=>i.threads&&i.threads.enabled&&i.threads.status==='pending'&&due(i)).length;
-            console.log(ig+th);
+            const fb=(q.items||[]).filter(i=>i.facebook&&i.facebook.enabled&&i.facebook.status==='pending'&&due(i)).length;
+            console.log(ig+th+fb);
           ")
           PROBE="${{ inputs.threads_probe }}"
-          if [ "$DUE" = "0" ] && [ -n "$PROBE" ] && [ "$PROBE" != "none" ]; then DUE=probe; fi
+          FBPROBE="${{ inputs.facebook_probe }}"
+          if [ "$DUE" = "0" ] && { { [ -n "$PROBE" ] && [ "$PROBE" != "none" ]; } || { [ -n "$FBPROBE" ] && [ "$FBPROBE" != "none" ]; }; }; then DUE=probe; fi
           echo "due=$DUE" >> "$GITHUB_OUTPUT"
-          echo "지금 올릴 게시물(인스타+스레드): $DUE 건"
+          echo "지금 올릴 게시물(인스타+스레드+페이스북): $DUE 건"
 
       - uses: actions/setup-node@v4
         if: steps.check.outputs.due != '0'
@@ -75,24 +82,41 @@ jobs:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
         run: node .github/scripts/th-post.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
 
-      # 수동 점검(workflow_dispatch threads_probe=check|probe) — 게시하지 않고 토큰·사진·컨테이너만 확인해 ig/threads-check.json 에 기록
+      # 페이스북 — 인스타·스레드 단계가 실패해도 진행한다(always). queue.json 의 facebook 필드만 바꾼다.
+      - name: 페이스북 게시
+        if: always() && steps.check.outputs.due != '0' && steps.check.outputs.due != 'probe'
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: node .github/scripts/fb-post.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      # 수동 점검(workflow_dispatch threads_probe=check|probe|test-post) — 게시하지 않고 토큰·사진·컨테이너만 확인해 ig/threads-check.json 에 기록
       - name: 스레드 점검
-        if: steps.check.outputs.due == 'probe'
+        if: steps.check.outputs.due == 'probe' && inputs.threads_probe != 'none' && inputs.threads_probe != ''
         env:
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
         run: node .github/scripts/th-post.mjs ${{ inputs.threads_probe == 'test-post' && '--test-post' || inputs.threads_probe == 'probe' && '--probe' || '--check' }}
 
+      # 수동 점검(facebook_probe) — ig/facebook-check.json 에 기록
+      - name: 페이스북 점검
+        if: always() && steps.check.outputs.due == 'probe' && inputs.facebook_probe != 'none' && inputs.facebook_probe != ''
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+        run: node .github/scripts/fb-post.mjs ${{ inputs.facebook_probe == 'test-post' && '--test-post' || inputs.facebook_probe == 'probe' && '--probe' || '--check' }}
+
       # 인스타·스레드 결과(+점검 결과)를 한 번의 커밋·push 로 기록한다(두 번 push 하면 충돌).
       - name: 결과를 queue.json 에 기록
         if: always() && steps.check.outputs.due != '0' && !inputs.dry_run
         run: |
-          if [ -z "$(git status --porcelain ig/queue.json ig/threads-check.json)" ]; then
-            echo "queue.json / threads-check.json 변경 없음"; exit 0
+          if [ -z "$(git status --porcelain ig/queue.json ig/threads-check.json ig/facebook-check.json)" ]; then
+            echo "queue.json / threads-check.json / facebook-check.json 변경 없음"; exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add ig/queue.json
           [ -f ig/threads-check.json ] && git add ig/threads-check.json || true
-          git commit -m "인스타·스레드: 게시 결과 기록 [skip ci]"
+          [ -f ig/facebook-check.json ] && git add ig/facebook-check.json || true
+          git commit -m "인스타·스레드·페이스북: 게시 결과 기록 [skip ci]"
           git push
