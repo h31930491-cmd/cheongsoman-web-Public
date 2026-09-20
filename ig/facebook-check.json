@@ -1,37 +1,13 @@
 {
-  "checkedAt": "2026-09-20T12:18:28.593Z",
-  "mode": "diagnose",
-  "me": {
-    "id": "28685760647780242",
-    "name": "강한샘"
-  },
-  "tokenKind": "user-or-other",
-  "pageTasks": {
-    "error": "GET \t1252744001260789 실패 (HTTP 400) code=100 sub=- type=OAuthException fbtrace=A78nwPujx6-y9IAj1GvoZ_H: (#100) Tried accessing nonexisting field (tasks)"
-  },
-  "permissions": [
-    "pages_show_list:granted",
-    "pages_read_engagement:granted",
-    "pages_manage_posts:granted",
-    "public_profile:granted"
-  ],
-  "accounts": [
-    {
-      "id": "1252744001260789",
-      "name": "청소만",
-      "tasks": [
-        "MODERATE",
-        "MESSAGING",
-        "ANALYZE",
-        "ADVERTISE",
-        "CREATE_CONTENT",
-        "MANAGE",
-        "MANAGE_LEADS"
-      ],
-      "hasPageToken": true
-    }
-  ],
-  "verdict": [
-    "이 사용자 토큰으로는 페이지 \t1252744001260789 의 토큰을 받을 수 없다(관리 권한/권한 범위 확인)."
-  ]
+  "checkedAt": "2026-09-20T12:34:15.772Z",
+  "mode": "test-post",
+  "image": "https://cheongsoman.com/ig/2026-09-21-0700/01.jpg",
+  "text": "청소만 페이스북 연동 테스트입니다. 곧 지웁니다.",
+  "post": {
+    "ok": true,
+    "id": "1252744001260789_122115463221441056",
+    "permalink": "https://www.facebook.com/122115463239441056/posts/122115463221441056",
+    "mode": "photos",
+    "postedAt": "2026-09-20T12:34:20.881Z"
+  }
 }
