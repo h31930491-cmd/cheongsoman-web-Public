@@ -8,6 +8,9 @@
 //   · pages-api/posts — 권한 pages_manage_posts · pages_read_engagement, 페이지 액세스 토큰(CREATE_CONTENT 권한자)
 //   · 한 게시물 최대 사진 수·본문 글자 수 한도는 문서에 명시 없음(캐러셀 개념 없이 attached_media 나열).
 //   · 페이지 토큰은 "do not have an expiration date"(facebook-login/guides/access-tokens/get-long-lived) — 갱신 없이 유효성 확인만.
+//   · 새 페이지 체계(NPE, community/threads/821885815292926): "you will not be able to access it via API without using a Page access token".
+//     /photos 는 차단 목록에 없고(옛 앨범 /{album-id}/photos 만 Permission Error 200), "(#200) publish_actions … deprecated" 는
+//     사용자 토큰으로 페이지에 쓰기를 시도할 때의 전형적 오류 → --diagnose 로 토큰이 페이지 토큰인지부터 가른다.
 const API_HOST = 'https://graph.facebook.com';
 const VERSION = process.env.FB_API_VERSION || 'v26.0'; // ig-api.mjs 와 같은 세대(2026-07-29 릴리스)
 
@@ -42,9 +45,13 @@ async function request(method, pathname, params, token) {
   }
   if (!res.ok || json.error) {
     const e = json.error || {};
-    throw new Error(
-      `${method} ${pathname} 실패 (HTTP ${res.status}) code=${e.code ?? '-'} sub=${e.error_subcode ?? '-'}: ${e.message ?? text.slice(0, 300)}`,
+    // 메시지를 자르지 않는다(원인 파악용). type·fbtrace_id 도 남긴다.
+    const err = new Error(
+      `${method} ${pathname} 실패 (HTTP ${res.status}) code=${e.code ?? '-'} sub=${e.error_subcode ?? '-'} type=${e.type ?? '-'} fbtrace=${e.fbtrace_id ?? '-'}: ${e.message ?? text}`,
     );
+    err.fbCode = e.code;
+    err.status = res.status;
+    throw err;
   }
   return json;
 }
@@ -55,6 +62,32 @@ export const fbPost = (pathname, params, token) => request('POST', pathname, par
 /** 토큰·페이지 확인 — GET /{page-id}?fields=id,name (페이지 토큰이면 자기 페이지). */
 export async function getPage(pageId, token) {
   return fbGet(pageId, { fields: 'id,name' }, token);
+}
+
+// ---- 진단(--diagnose) ----
+/** 이 토큰의 주체 — 페이지 토큰이면 페이지(id=페이지 id), 사용자 토큰이면 사람. */
+export async function getMe(token) {
+  return fbGet('me', { fields: 'id,name' }, token);
+}
+/** 페이지에서 이 토큰 주체가 가진 작업 권한(tasks: CREATE_CONTENT 등). */
+export async function getPageTasks(pageId, token) {
+  return fbGet(pageId, { fields: 'id,name,tasks' }, token);
+}
+/** 토큰에 붙은 권한 목록(status granted/declined). 사용자 토큰 기준; 페이지 토큰은 빈 목록이거나 오류일 수 있다. */
+export async function getPermissions(token) {
+  const r = await fbGet('me/permissions', {}, token);
+  return r.data || [];
+}
+/** 사용자 토큰으로 관리 페이지 목록(+페이지 토큰). 페이지 토큰 값은 호출부가 절대 출력하지 않는다. */
+export async function getAccounts(token) {
+  const r = await fbGet('me/accounts', { fields: 'id,name,tasks,access_token' }, token);
+  return r.data || [];
+}
+
+/** 링크 게시(사진 URL 1개를 link 로) — /photos 가 막힐 때의 대체. 미리보기 카드 형태라 여러 장 불가. */
+export async function createLinkPost(pageId, link, message, token) {
+  const r = await fbPost(`${pageId}/feed`, { message, link }, token);
+  return r.id;
 }
 
 /** 사진 1장 업로드(게시 안 함) — 24시간 안에 feed 에 붙여야 한다. 반환 = photo id. */

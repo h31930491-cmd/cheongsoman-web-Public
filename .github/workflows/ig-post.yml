@@ -20,9 +20,9 @@ on:
         options: ['none', 'check', 'probe', 'test-post']
         default: 'none'
       facebook_probe:
-        description: '페이스북 점검: check=페이지·토큰만 / probe=사진 업로드까지(게시 안 함) / test-post=사진 1장 실제 게시(큐 무접촉). 결과는 ig/facebook-check.json'
+        description: '페이스북: diagnose=토큰 종류·권한 진단 / fix-token=사용자 토큰이면 페이지 토큰으로 시크릿 교체 / check / probe(업로드까지) / test-post(사진 1장 실제 게시). 결과 ig/facebook-check.json'
         type: choice
-        options: ['none', 'check', 'probe', 'test-post']
+        options: ['none', 'diagnose', 'fix-token', 'check', 'probe', 'test-post']
         default: 'none'
 
 concurrency:
@@ -104,7 +104,8 @@ jobs:
         env:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-        run: node .github/scripts/fb-post.mjs ${{ inputs.facebook_probe == 'test-post' && '--test-post' || inputs.facebook_probe == 'probe' && '--probe' || '--check' }}
+          GH_TOKEN: ${{ secrets.GH_PAT_SECRETS }} # fix-token 이 시크릿을 되쓸 때만 사용(토큰 갱신 워크플로와 같은 PAT)
+        run: node .github/scripts/fb-post.mjs ${{ inputs.facebook_probe == 'test-post' && '--test-post' || inputs.facebook_probe == 'probe' && '--probe' || inputs.facebook_probe == 'diagnose' && '--diagnose' || inputs.facebook_probe == 'fix-token' && '--fix-token' || '--check' }}
 
       # 인스타·스레드 결과(+점검 결과)를 한 번의 커밋·push 로 기록한다(두 번 push 하면 충돌).
       - name: 결과를 queue.json 에 기록

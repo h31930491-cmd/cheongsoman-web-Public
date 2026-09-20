@@ -111,14 +111,15 @@ export async function runQueuePost({ key, label, idField, dryRun, describe, read
       log(`  ✔ ${label} 게시 완료 ${idField}=${id} ${permalink ?? ''}`);
     } catch (e) {
       p.attempts = (p.attempts || 0) + 1;
-      p.lastError = String(e.message || e).slice(0, 500);
+      const full = String(e.message || e);
+      p.lastError = full.slice(0, 1000);
       if (p.attempts >= MAX_ATTEMPTS) {
         p.status = 'failed';
         log(`  ✖ ${p.attempts}회 실패 — ${key}.status=failed 로 확정합니다.`);
       } else {
         log(`  ✖ 실패 (${p.attempts}/${MAX_ATTEMPTS}) — 다음 실행에서 다시 시도합니다.`);
       }
-      log(`    ${p.lastError}`);
+      log(`    ${full}`); // 로그에는 자르지 않고 전부
       changed = true;
       failed++;
     }
@@ -141,7 +142,7 @@ export async function runCheck({ key, label, mode, checkPath, q, verifyToken, ch
     const t = await verifyToken();
     result.token = { ok: true, ...t };
   } catch (e) {
-    result.token = { ok: false, error: String(e.message || e).slice(0, 500) };
+    result.token = { ok: false, error: String(e.message || e) };
     log(`토큰 확인 실패: ${result.token.error}`);
     writeCheck(checkPath, result);
     return 1;
@@ -155,7 +156,7 @@ export async function runCheck({ key, label, mode, checkPath, q, verifyToken, ch
       result.image = { ok: true, item: next.id, count: urls.length };
       log(`사진 ${urls.length}장 공개 확인 (${next.id})`);
     } catch (e) {
-      result.image = { ok: false, item: next.id, error: String(e.message || e).slice(0, 500) };
+      result.image = { ok: false, item: next.id, error: String(e.message || e) };
       log(`사진 확인 실패: ${result.image.error}`);
     }
     if (mode === 'probe' && result.image.ok) {
@@ -164,7 +165,7 @@ export async function runCheck({ key, label, mode, checkPath, q, verifyToken, ch
         result.container = { ok: true, item: next.id, ...built, note: probeNote };
         log(`${label} 게시 직전 단계 성공 ${JSON.stringify(built)} — 게시하지 않고 둡니다(${probeNote})`);
       } catch (e) {
-        result.container = { ok: false, item: next.id, error: String(e.message || e).slice(0, 500) };
+        result.container = { ok: false, item: next.id, error: String(e.message || e) };
         log(`${label} 게시 직전 단계 실패: ${result.container.error}`);
       }
     }
@@ -179,12 +180,12 @@ export async function runCheck({ key, label, mode, checkPath, q, verifyToken, ch
 export async function runTestPost({ label, checkPath, imageUrl, text, testPost }) {
   const result = { checkedAt: new Date().toISOString(), mode: 'test-post', image: imageUrl, text, post: null };
   try {
-    const { id, permalink } = await testPost();
-    result.post = { ok: true, id, permalink, postedAt: new Date().toISOString() };
+    const { id, permalink, ...extra } = await testPost();
+    result.post = { ok: true, id, permalink, ...extra, postedAt: new Date().toISOString() };
     log(`✔ ${label} 테스트 게시 완료 id=${id} permalink=${permalink ?? '(조회 실패)'}`);
     log('  확인 후 앱에서 직접 삭제하세요.');
   } catch (e) {
-    result.post = { ok: false, error: String(e.message || e).slice(0, 500) };
+    result.post = { ok: false, error: String(e.message || e) };
     log(`✖ ${label} 테스트 게시 실패: ${result.post.error}`);
   }
   writeCheck(checkPath, result);
