@@ -307,12 +307,13 @@
       },
       "facebook": {
         "enabled": true,
-        "status": "pending",
-        "postId": null,
-        "permalink": null,
-        "postedAt": null,
+        "status": "posted",
+        "postId": "1252744001260789_122115677907441056",
+        "permalink": "https://www.facebook.com/122115463239441056/posts/122115677907441056",
+        "postedAt": "2026-09-21T04:31:00.074Z",
         "attempts": 0,
-        "lastError": null
+        "lastError": null,
+        "mode": "photos"
       }
     }
   ]
