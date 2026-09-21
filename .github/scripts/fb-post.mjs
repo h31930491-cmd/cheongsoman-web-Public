@@ -9,8 +9,11 @@
 // 환경변수: FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN  (--fix-token 은 GH_TOKEN 도 필요)
 // 옵션:  --dry-run / --check(페이지·토큰 확인, ig/facebook-check.json 기록) / --probe(사진 업로드까지, 게시 안 함 — 24시간 뒤 자동 삭제)
 //        --test-post(큐 무접촉, 사진 1장 고정 본문 실제 게시 — 확인 후 삭제)
-//        --diagnose  토큰 종류(GET /me)·페이지 작업 권한(GET /{page}?fields=tasks)·권한 목록(GET /me/permissions) 진단. 토큰 값은 출력 안 함
+//        --diagnose  토큰 종류(GET /me)·만료(GET /debug_token)·페이지 작업 권한(GET /{page}?fields=tasks)·권한 목록(GET /me/permissions) 진단. 토큰 값은 출력 안 함
 //        --fix-token 토큰이 '사용자 토큰'이면 GET /me/accounts 에서 FB_PAGE_ID 의 페이지 토큰을 받아 시크릿 FB_PAGE_ACCESS_TOKEN 을 되쓴다(gh, 값 미출력)
+//                    받은 페이지 토큰에 만료가 있으면(단기 사용자 토큰에서 받은 것) 쓰지 않고 종료 1
+// --check 는 토큰이 지금 유효해도 만료가 있으면 실패(1)로 표시한다 — 2026-09-21 07:00 게시가 단기 토큰 만료(code 190 sub 463)로 실패한 재발 방지.
+// 시크릿 FB_PAGE_ID / FB_PAGE_ACCESS_TOKEN 은 앞뒤 공백·탭을 제거하고 쓴다(FB_PAGE_ID 앞 탭 실측).
 //
 // 게시 실패 대비: /photos 가 "(#200) publish_actions … deprecated"(code 200) 로 막히면 /feed 에 link(첫 사진 URL)로 대체 게시하고
 //  facebook.mode='link-fallback' 으로 기록한다(미리보기 카드 1장 — 여러 장 불가). 원인은 --diagnose 로 확인.
@@ -27,6 +30,7 @@ import {
   getPageTasks,
   getPermalink,
   getPermissions,
+  getTokenInfo,
   uploadPhotoUnpublished,
 } from './fb-api.mjs';
 import { imageUrls, loadQueue, log, runCheck, runMain, runQueuePost, runTestPost, writeCheck } from './post-common.mjs';
@@ -44,6 +48,22 @@ const TEST_TEXT = '청소만 페이스북 연동 테스트입니다. 곧 지웁�
 
 /** /photos 거부(code 200 publish_actions) 판정 — 이때만 /feed link 게시로 대체한다. */
 const isPhotosBlocked = (e) => e && e.fbCode === 200 && /publish_actions/.test(String(e.message || ''));
+
+/**
+ * debug_token 결과를 기록용 필드 + 로그 한 줄로. 페이지 토큰은 만료가 없어야 정상(expires_at 0).
+ * 2026-09-21 07:00 게시 실패 원인: 수동으로 넣은 페이지 토큰이 단기(1시간여) 토큰이라 9/20 23:00 KST 에 만료(code 190 sub 463).
+ */
+function summarizeTokenInfo(info) {
+  if (!info) return { tokenType: null, expiresAt: null, expires: null, note: 'debug_token 조회 실패(진단 불가)' };
+  const exp = Number(info.expires_at || 0);
+  const expiresAt = exp > 0 ? new Date(exp * 1000).toISOString() : null;
+  const expires = exp > 0;
+  const type = info.type ?? null;
+  const note = expires
+    ? `⚠ 이 토큰은 ${expiresAt} 에 만료됩니다(단기 토큰). 장기 사용자 토큰으로 받은 페이지 토큰은 만료가 없어야 합니다.`
+    : '만료 없음(정상)';
+  return { tokenType: type, expiresAt, expires, valid: info.is_valid ?? null, note };
+}
 
 /** 사진 업로드(게시 안 함)까지 — probe 용. 반환 = photo id 목록. */
 async function uploadAll(item, pageId, token) {
@@ -86,7 +106,10 @@ async function publishPhotos(pageId, urls, message, token) {
 
 /** --diagnose: 토큰 종류·페이지 권한·권한 목록. 토큰 값은 절대 출력하지 않는다. 결과는 ig/facebook-check.json */
 async function runDiagnose(pageId, token) {
-  const result = { checkedAt: new Date().toISOString(), mode: 'diagnose', me: null, tokenKind: null, pageTasks: null, permissions: null, accounts: null, verdict: [] };
+  const result = { checkedAt: new Date().toISOString(), mode: 'diagnose', me: null, tokenKind: null, tokenInfo: null, pageTasks: null, permissions: null, accounts: null, verdict: [] };
+  result.tokenInfo = summarizeTokenInfo(await getTokenInfo(token));
+  log(`GET /debug_token → 종류 ${result.tokenInfo.tokenType ?? '?'} · ${result.tokenInfo.note}`);
+  if (result.tokenInfo.expires) result.verdict.push('토큰에 만료가 있다. 이대로 두면 예약 게시가 만료 뒤 code 190 으로 실패한다(2026-09-21 사고). 장기 토큰으로 교체.');
   try {
     const me = await getMe(token);
     result.me = { id: me.id ?? null, name: me.name ?? null };
@@ -146,6 +169,13 @@ async function runFixToken(pageId, token) {
     console.error(`이 토큰으로 페이지 ${pageId} 의 토큰을 받을 수 없습니다. 관리 페이지: ${accounts.map((a) => `${a.name}(${a.id})`).join(', ') || '없음'}`);
     return 1;
   }
+  // 단기 사용자 토큰으로 받은 페이지 토큰은 같이 단기(1시간여)라 예약 게시 전에 만료된다(2026-09-21 사고). 만료가 있으면 시크릿에 쓰지 않는다.
+  const pageInfo = summarizeTokenInfo(await getTokenInfo(token, target.access_token));
+  log(`받은 페이지 토큰: 종류 ${pageInfo.tokenType ?? '?'} · ${pageInfo.note}`);
+  if (pageInfo.expires) {
+    console.error('만료가 있는 페이지 토큰이라 시크릿에 쓰지 않습니다. 사용자 토큰을 장기 토큰(60일)으로 바꾼 뒤(액세스 토큰 디버거 → "액세스 토큰 연장") 다시 --fix-token 하세요.');
+    return 1;
+  }
   const repo = process.env.GITHUB_REPOSITORY;
   if (!repo || !process.env.GH_TOKEN) {
     console.error('GITHUB_REPOSITORY / GH_TOKEN(PAT) 이 없어 시크릿을 갱신할 수 없습니다.');
@@ -160,8 +190,12 @@ async function runFixToken(pageId, token) {
 }
 
 async function main() {
-  const pageId = process.env.FB_PAGE_ID;
-  const token = process.env.FB_PAGE_ACCESS_TOKEN;
+  // 시크릿 앞뒤 공백·탭 제거. 실측: FB_PAGE_ID 값 앞에 탭이 들어 있어(로그 "POST \t…/photos") --diagnose/--fix-token 의
+  // 페이지 ID 비교(String(a.id) === String(pageId))가 실패했다(2026-09-20 21:18·21:21 실행). URL 은 탭을 지워 게시 자체는 됐다.
+  const pageId = String(process.env.FB_PAGE_ID ?? '').trim();
+  const token = String(process.env.FB_PAGE_ACCESS_TOKEN ?? '').trim();
+  if (process.env.FB_PAGE_ID !== undefined && process.env.FB_PAGE_ID !== pageId) log('⚠ FB_PAGE_ID 시크릿 앞뒤에 공백/탭이 있어 제거하고 씁니다. 시크릿 값을 정리하세요.');
+  if (process.env.FB_PAGE_ACCESS_TOKEN !== undefined && process.env.FB_PAGE_ACCESS_TOKEN !== token) log('⚠ FB_PAGE_ACCESS_TOKEN 시크릿 앞뒤에 공백/탭이 있어 제거하고 씁니다.');
   const ready = () => {
     if (!pageId || !token) {
       console.error('FB_PAGE_ID / FB_PAGE_ACCESS_TOKEN 이 없습니다. 저장소 Secrets 를 확인하세요.');
@@ -207,7 +241,11 @@ async function main() {
         const page = await getPage(pageId, token);
         const matchesPageId = String(page.id) === String(pageId);
         log(`토큰 정상. 페이지 "${page.name ?? '-'}" (id ${page.id ?? '-'})${matchesPageId ? '' : ' ⚠ FB_PAGE_ID 와 다름'}`);
-        return { id: page.id ?? null, name: page.name ?? null, matchesPageId };
+        // 지금은 유효해도 만료가 있는 토큰이면 실패로 표시한다(주간 확인 워크플로가 빨간불로 알리게). 2026-09-21 사고 재발 방지.
+        const info = summarizeTokenInfo(await getTokenInfo(token));
+        log(`GET /debug_token → 종류 ${info.tokenType ?? '?'} · ${info.note}`);
+        if (info.expires) throw new Error(`토큰에 만료가 있습니다(${info.expiresAt}). 장기 사용자 토큰으로 받은 페이지 토큰(만료 없음)으로 교체하세요.`);
+        return { id: page.id ?? null, name: page.name ?? null, matchesPageId, ...info };
       },
       checkImage: checkImageUrl,
       probeBuild: async (item) => ({ photoIds: await uploadAll(item, pageId, token) }),

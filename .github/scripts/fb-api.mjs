@@ -83,6 +83,19 @@ export async function getAccounts(token) {
   const r = await fbGet('me/accounts', { fields: 'id,name,tasks,access_token' }, token);
   return r.data || [];
 }
+/**
+ * 토큰 자체의 정보 — GET /debug_token?input_token=… (facebook-login/guides/access-tokens/debugging).
+ * data.type 'USER'|'PAGE', data.expires_at (초, 0 = 만료 없음), data.is_valid. 조회 토큰으로 같은 토큰을 쓴다(앱 관리자 토큰이면 허용).
+ * 2026-09-21 사고(단기 페이지 토큰이 1시간여 만에 만료 → code 190 sub 463)를 --check/--fix-token 에서 미리 잡기 위한 것. 실패 시 null(진단 불가).
+ */
+export async function getTokenInfo(token, inspected = token) {
+  try {
+    const r = await fbGet('debug_token', { input_token: inspected }, token);
+    return r.data ?? null;
+  } catch {
+    return null;
+  }
+}
 
 /** 링크 게시(사진 URL 1개를 link 로) — /photos 가 막힐 때의 대체. 미리보기 카드 형태라 여러 장 불가. */
 export async function createLinkPost(pageId, link, message, token) {
