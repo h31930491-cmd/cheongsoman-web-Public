@@ -328,29 +328,30 @@
         "ig/2026-09-22-0700/05.jpg"
       ],
       "mediaType": "CAROUSEL",
-      "status": "pending",
+      "status": "posted",
       "attempts": 0,
-      "mediaId": null,
-      "permalink": null,
-      "postedAt": null,
+      "mediaId": "18108551117268775",
+      "permalink": "https://www.instagram.com/p/DdkL2wcAX1J/",
+      "postedAt": "2026-09-21T22:01:32.274Z",
       "lastError": null,
       "threads": {
         "enabled": true,
-        "status": "pending",
-        "mediaId": null,
-        "permalink": null,
-        "postedAt": null,
+        "status": "posted",
+        "mediaId": "17953321041254782",
+        "permalink": "https://www.threads.com/@cheo.ngsoman/post/DdkL7zLAUf5",
+        "postedAt": "2026-09-21T22:02:13.584Z",
         "attempts": 0,
         "lastError": null
       },
       "facebook": {
         "enabled": true,
-        "status": "pending",
-        "postId": null,
-        "permalink": null,
-        "postedAt": null,
+        "status": "posted",
+        "postId": "1252744001260789_122116032915441056",
+        "permalink": "https://www.facebook.com/122115463239441056/posts/122116032915441056",
+        "postedAt": "2026-09-21T22:02:27.145Z",
         "attempts": 0,
-        "lastError": null
+        "lastError": null,
+        "mode": "photos"
       }
     }
   ]
