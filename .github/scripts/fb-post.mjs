@@ -181,8 +181,10 @@ async function runFixToken(pageId, token) {
     console.error('GITHUB_REPOSITORY / GH_TOKEN(PAT) 이 없어 시크릿을 갱신할 수 없습니다.');
     return 1;
   }
-  execFileSync('gh', ['secret', 'set', 'FB_PAGE_ACCESS_TOKEN', '--repo', repo, '--body-file', '-'], {
-    input: target.access_token,
+  // gh 러너 버전에 --body-file 이 없어(2026-09-21 실측 'unknown flag: --body-file') 플래그 없이 표준입력으로만 넘긴다.
+  // --body 로 값을 붙이면 프로세스 목록에 토큰이 노출되므로 금지. 값 끝 줄바꿈은 제거(시크릿에 개행이 섞이지 않게).
+  execFileSync('gh', ['secret', 'set', 'FB_PAGE_ACCESS_TOKEN', '--repo', repo], {
+    input: String(target.access_token).replace(/[\r\n]+$/, ''),
     stdio: ['pipe', 'inherit', 'inherit'],
   });
   log(`시크릿 FB_PAGE_ACCESS_TOKEN 을 페이지 "${target.name}" 토큰으로 교체했습니다. 다음 실행부터 적용됩니다.`);

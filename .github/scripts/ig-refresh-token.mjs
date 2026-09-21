@@ -83,8 +83,10 @@ async function main() {
 
   // gh CLI 가 저장소 공개키로 암호화까지 처리한다(러너에 기본 설치돼 있다).
   // 토큰 값은 인자가 아니라 표준입력으로 넘겨 프로세스 목록에 남지 않게 한다.
-  execFileSync('gh', ['secret', 'set', SECRET_NAME, '--repo', repo, '--body-file', '-'], {
-    input: r.access_token,
+  // gh 러너 버전에 --body-file 이 없어(2026-09-21 실측 'unknown flag: --body-file') 플래그 없이 표준입력으로만 넘긴다.
+  // --body 로 값을 붙이면 프로세스 목록에 토큰이 노출되므로 금지. 값 끝 줄바꿈은 제거(시크릿에 개행이 섞이지 않게).
+  execFileSync('gh', ['secret', 'set', SECRET_NAME, '--repo', repo], {
+    input: String(r.access_token).replace(/[\r\n]+$/, ''),
     stdio: ['pipe', 'inherit', 'inherit'],
   });
   console.log(`저장소 시크릿 ${SECRET_NAME} 갱신 완료 (${repo})`);
