@@ -1,9 +1,16 @@
 {
-  "checkedAt": "2026-09-21T04:06:13.888Z",
+  "checkedAt": "2026-09-21T04:17:55.278Z",
   "mode": "probe",
   "token": {
-    "ok": false,
-    "error": "토큰에 만료가 있습니다(2026-11-20T04:01:36.000Z). 장기 사용자 토큰으로 받은 페이지 토큰(만료 없음)으로 교체하세요."
+    "ok": true,
+    "id": "1252744001260789",
+    "name": "청소만",
+    "matchesPageId": true,
+    "tokenType": "PAGE",
+    "expiresAt": null,
+    "expires": false,
+    "valid": true,
+    "note": "만료 없음(정상)"
   },
   "image": null,
   "container": null
