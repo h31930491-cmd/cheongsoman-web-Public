@@ -315,6 +315,43 @@
         "lastError": null,
         "mode": "photos"
       }
+    },
+    {
+      "id": "2026-09-22-0700",
+      "scheduledAt": "2026-09-22T07:00:00+09:00",
+      "caption": "사장님, 직원이랑 하루에 톡 몇 번 하세요?\n\"내일 몇 시예요?\" \"주소 다시 보내주세요\" \"이번 달 몇 건이에요?\"\n\n청소만 직원 계정이면 이 톡이 줄어듭니다.\n\n직원이 앱을 열면 배정된 예약이 보입니다.\n시간, 고객, 주소, 메모까지 그대로.\n\n이번 달 완료 건수와 매출, 수수료도\n직원이 '내 정산'에서 직접 확인합니다.\n\n연결은 초대 코드 6자리와 전화번호로.\n둘 다 맞아야 연결됩니다.\n\n#청소업 #청소업체 #직원관리 #청소창업 #청소만",
+      "images": [
+        "ig/2026-09-22-0700/01.jpg",
+        "ig/2026-09-22-0700/02.jpg",
+        "ig/2026-09-22-0700/03.jpg",
+        "ig/2026-09-22-0700/04.jpg",
+        "ig/2026-09-22-0700/05.jpg"
+      ],
+      "mediaType": "CAROUSEL",
+      "status": "pending",
+      "attempts": 0,
+      "mediaId": null,
+      "permalink": null,
+      "postedAt": null,
+      "lastError": null,
+      "threads": {
+        "enabled": true,
+        "status": "pending",
+        "mediaId": null,
+        "permalink": null,
+        "postedAt": null,
+        "attempts": 0,
+        "lastError": null
+      },
+      "facebook": {
+        "enabled": true,
+        "status": "pending",
+        "postId": null,
+        "permalink": null,
+        "postedAt": null,
+        "attempts": 0,
+        "lastError": null
+      }
     }
   ]
 }
