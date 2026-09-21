@@ -1,13 +1,10 @@
 {
-  "checkedAt": "2026-09-20T12:34:15.772Z",
-  "mode": "test-post",
-  "image": "https://cheongsoman.com/ig/2026-09-21-0700/01.jpg",
-  "text": "청소만 페이스북 연동 테스트입니다. 곧 지웁니다.",
-  "post": {
-    "ok": true,
-    "id": "1252744001260789_122115463221441056",
-    "permalink": "https://www.facebook.com/122115463239441056/posts/122115463221441056",
-    "mode": "photos",
-    "postedAt": "2026-09-20T12:34:20.881Z"
-  }
+  "checkedAt": "2026-09-21T04:06:13.888Z",
+  "mode": "probe",
+  "token": {
+    "ok": false,
+    "error": "토큰에 만료가 있습니다(2026-11-20T04:01:36.000Z). 장기 사용자 토큰으로 받은 페이지 토큰(만료 없음)으로 교체하세요."
+  },
+  "image": null,
+  "container": null
 }
