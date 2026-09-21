@@ -307,12 +307,12 @@
       },
       "facebook": {
         "enabled": true,
-        "status": "failed",
+        "status": "pending",
         "postId": null,
         "permalink": null,
         "postedAt": null,
-        "attempts": 3,
-        "lastError": "POST \t1252744001260789/photos 실패 (HTTP 400) code=190 sub=463 type=OAuthException fbtrace=AaTcBOw0-MgwrfvXqoMUZFd: Error validating access token: Session has expired on Sunday, 20-Sep-26 07:00:00 PDT. The current time is Sunday, 20-Sep-26 15:10:34 PDT."
+        "attempts": 0,
+        "lastError": null
       }
     }
   ]
